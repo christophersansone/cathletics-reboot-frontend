@@ -5,9 +5,9 @@ export default class LoginRoute extends Route {
   @service session;
   @service router;
 
-  beforeModel() {
+  redirect() {
     if (this.session.isAuthenticated) {
-      this.router.transitionTo('orgs');
+      this.router.transitionTo('index');
     }
   }
 }
