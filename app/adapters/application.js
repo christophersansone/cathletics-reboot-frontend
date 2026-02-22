@@ -17,10 +17,26 @@ export default class ApplicationAdapter extends JSONAPIAdapter {
     return headers;
   }
 
-  handleResponse(status, headers, payload, requestData) {
-    if (status === 401 && this.session.isAuthenticated) {
-      this.session.invalidate();
+  async ajax(...args) {
+    try {
+      return await super.ajax(...args);
+    } catch (error) {
+      if (this._isUnauthorized(error) && this.session.refreshToken) {
+        let refreshed = await this.session.refreshAccessToken();
+        if (refreshed) {
+          return super.ajax(...args);
+        }
+      }
+
+      if (this._isUnauthorized(error) && this.session.isAuthenticated) {
+        this.session.invalidate();
+      }
+
+      throw error;
     }
-    return super.handleResponse(status, headers, payload, requestData);
+  }
+
+  _isUnauthorized(error) {
+    return error?.errors?.some((e) => String(e.status) === '401');
   }
 }

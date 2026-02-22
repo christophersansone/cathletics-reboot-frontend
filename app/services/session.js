@@ -2,6 +2,7 @@ import Service from '@ember/service';
 import { inject as service } from '@ember/service';
 import { tracked } from '@glimmer/tracking';
 import config from 'frontend/config/environment';
+import { task } from 'ember-concurrency';
 
 export default class SessionService extends Service {
   @service store;
@@ -45,14 +46,51 @@ export default class SessionService extends Service {
     }
 
     let data = await response.json();
+    this._setTokens(data);
+
+    await this.loadCurrentUser();
+  }
+
+  async refreshAccessToken() {
+    if (!this.refreshToken) return false;
+    const task = this.refreshAccessTokenTask;
+    if (task.isRunning) {
+      return await task.last;
+    } else {
+      return await task.perform();
+    }
+  }
+
+  refreshAccessTokenTask = task({ drop: true }, async () => {
+    try {
+      let response = await fetch(`${config.APP.apiHost}/oauth/token`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          grant_type: 'refresh_token',
+          refresh_token: this.refreshToken,
+          client_id: config.APP.oauthClientId,
+        }),
+      });
+
+      if (!response.ok) return false;
+
+      let data = await response.json();
+      this._setTokens(data);
+      await this.loadCurrentUser();
+      return true;
+    } catch {
+      return false;
+    }
+  });
+
+  _setTokens(data) {
     this.accessToken = data.access_token;
     this.refreshToken = data.refresh_token;
     this.isAuthenticated = true;
 
     localStorage.setItem('cathletics:accessToken', data.access_token);
     localStorage.setItem('cathletics:refreshToken', data.refresh_token);
-
-    await this.loadCurrentUser();
   }
 
   async loadCurrentUser() {

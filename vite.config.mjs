@@ -12,6 +12,13 @@ export default defineConfig({
     babel({
       babelHelpers: 'runtime',
       extensions,
+      plugins: [
+        'ember-concurrency/async-arrow-task-transform',
+        // for ember-concurrency
+        //['@babel/plugin-proposal-decorators', { legacy: true }],
+        //['@babel/plugin-proposal-class-properties', { loose: true }],
+        //['@babel/plugin-transform-class-static-block', { loose: true }],
+      ]
     }),
   ],
 });
