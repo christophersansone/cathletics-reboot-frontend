@@ -1,0 +1,27 @@
+.card {
+  background: var(--color-bg-raised);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-4) var(--space-6);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.card__title {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.card__body {
+  padding: var(--space-6);
+}
+
+.card--no-pad .card__body {
+  padding: 0;
+}

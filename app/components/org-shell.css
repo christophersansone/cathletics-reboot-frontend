@@ -1,0 +1,20 @@
+.topbar-menu-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-1);
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  cursor: pointer;
+}
+
+.topbar-menu-btn:hover {
+  background: var(--color-bg-sunken);
+}
+
+.topbar-user {
+  margin-left: auto;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}

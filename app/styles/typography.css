@@ -1,0 +1,31 @@
+@layer base {
+  h1 { font-size: 1.875rem; font-weight: 700; line-height: 1.2; letter-spacing: -0.025em; }
+  h2 { font-size: 1.5rem; font-weight: 600; line-height: 1.25; letter-spacing: -0.02em; }
+  h3 { font-size: 1.25rem; font-weight: 600; line-height: 1.3; }
+  h4 { font-size: 1.125rem; font-weight: 600; line-height: 1.35; }
+  h5 { font-size: 1rem; font-weight: 600; line-height: 1.4; }
+  h6 { font-size: 0.875rem; font-weight: 600; line-height: 1.4; text-transform: uppercase; letter-spacing: 0.05em; }
+
+  small,
+  .text-sm { font-size: 0.875rem; line-height: 1.4; }
+
+  .text-xs { font-size: 0.75rem; line-height: 1.4; }
+  .text-lg { font-size: 1.125rem; line-height: 1.5; }
+  .text-xl { font-size: 1.25rem; line-height: 1.4; }
+
+  .text-secondary { color: var(--color-text-secondary); }
+  .text-primary { color: var(--color-primary); }
+  .text-success { color: var(--color-success); }
+  .text-warning { color: var(--color-warning); }
+  .text-danger { color: var(--color-danger); }
+
+  .font-medium { font-weight: 500; }
+  .font-semibold { font-weight: 600; }
+  .font-bold { font-weight: 700; }
+
+  .truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}

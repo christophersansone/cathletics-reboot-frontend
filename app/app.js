@@ -18,3 +18,11 @@ export default class App extends Application {
 }
 
 loadInitializers(App, config.modulePrefix, compatModules);
+
+// import CSS files
+import './styles/reset.css';
+import './styles/typography.css';
+import './styles/utilities.css';
+import './styles/layout.css';
+import './styles/forms.css';
+import './styles/variables.css';
