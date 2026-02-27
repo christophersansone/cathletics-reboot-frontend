@@ -11,6 +11,7 @@ export default class SessionService extends Service {
   @tracked accessToken = null;
   @tracked refreshToken = null;
   @tracked currentUser = null;
+  @tracked currentOrgId = null;
   @tracked isAuthenticated = false;
 
   constructor() {
@@ -26,6 +27,7 @@ export default class SessionService extends Service {
       this.refreshToken = refresh;
       this.isAuthenticated = true;
     }
+    this.currentOrgId = localStorage.getItem('cathletics:orgId');
   }
 
   async authenticate(email, password) {
@@ -93,6 +95,16 @@ export default class SessionService extends Service {
     localStorage.setItem('cathletics:refreshToken', data.refresh_token);
   }
 
+  setOrganization(org) {
+    this.currentOrgId = org.id;
+    localStorage.setItem('cathletics:orgId', org.id);
+  }
+
+  clearOrganization() {
+    this.currentOrgId = null;
+    localStorage.removeItem('cathletics:orgId');
+  }
+
   async loadCurrentUser() {
     if (!this.isAuthenticated) return null;
     if (this.currentUser) return this.currentUser;
@@ -116,10 +128,12 @@ export default class SessionService extends Service {
     this.accessToken = null;
     this.refreshToken = null;
     this.currentUser = null;
+    this.currentOrgId = null;
     this.isAuthenticated = false;
 
     localStorage.removeItem('cathletics:accessToken');
     localStorage.removeItem('cathletics:refreshToken');
+    localStorage.removeItem('cathletics:orgId');
 
     this.router.transitionTo('login');
   }

@@ -1,5 +1,6 @@
 import JSONAPIAdapter from '@ember-data/adapter/json-api';
 import { inject as service } from '@ember/service';
+import { pluralize } from 'ember-inflector';
 import config from 'frontend/config/environment';
 
 export default class ApplicationAdapter extends JSONAPIAdapter {
@@ -8,11 +9,18 @@ export default class ApplicationAdapter extends JSONAPIAdapter {
   host = config.APP.apiHost;
   namespace = config.APP.apiNamespace;
 
+  pathForType(type) {
+    return pluralize(type.replace(/-/g, '_'));
+  }
+
   get headers() {
     let headers = { 'Content-Type': 'application/vnd.api+json' };
     let token = this.session.accessToken;
     if (token) {
       headers['Authorization'] = `Bearer ${token}`;
+    }
+    if (this.session.currentOrgId) {
+      headers['X-Org-Id'] = this.session.currentOrgId;
     }
     return headers;
   }

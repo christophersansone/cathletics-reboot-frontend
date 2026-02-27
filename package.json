@@ -90,6 +90,7 @@
     "edition": "octane"
   },
   "dependencies": {
+    "ember-inflector": "^6.0.0",
     "ember-truth-helpers": "^5.0.0"
   }
 }
