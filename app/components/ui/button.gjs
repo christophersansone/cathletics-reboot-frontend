@@ -1,22 +1,22 @@
 import Component from '@glimmer/component';
 
 const VARIANTS = {
-  primary: 'btn--primary',
-  secondary: 'btn--secondary',
-  ghost: 'btn--ghost',
-  danger: 'btn--danger',
+  primary: 'btn-primary',
+  secondary: 'btn-secondary',
+  ghost: 'btn-ghost',
+  danger: 'btn-danger',
 };
 
 const SIZES = {
-  sm: 'btn--sm',
-  md: 'btn--md',
-  lg: 'btn--lg',
+  sm: 'btn-sm',
+  md: 'btn-md',
+  lg: 'btn-lg',
 };
 
 export default class UiButton extends Component {
   get classes() {
     let cls = `btn ${VARIANTS[this.args.variant ?? 'primary']} ${SIZES[this.args.size ?? 'md']}`;
-    if (this.args.block) cls += ' btn--block';
+    if (this.args.block) cls += ' btn-block';
     return cls;
   }
 
@@ -26,7 +26,7 @@ export default class UiButton extends Component {
     {{else}}
       <button type={{if @type @type "button"}} class={{this.classes}} ...attributes>
         {{#if @loading}}
-          <span class="btn__spinner" />
+          <span class="btn-spinner" />
         {{/if}}
         {{yield}}
       </button>
