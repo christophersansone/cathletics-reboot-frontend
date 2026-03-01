@@ -45,7 +45,7 @@ export default class ModelErrors extends Component {
 
   <template>
     {{#if this.errorMessages}}
-      <Alert @variant="danger">
+      <Alert @variant="danger" ...attributes>
         <ul class="{{if (eq this.errorMessages.length 1) 'single' 'multiple'}}">
           {{#each this.errorMessages as |error|}}
             <li>{{error}}</li>

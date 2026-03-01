@@ -7,9 +7,8 @@ const DEFAULT_PAGE_SIZE = 100;
 export default class PaginationService extends Service {
   @service store;
 
-  query(type, queryParams, { pageSize = DEFAULT_PAGE_SIZE }) {
+  query(type, queryParams, { pageSize = DEFAULT_PAGE_SIZE } = {}) {
     let paginator = null;
-    let first = true;
     let nextUrl = null;
 
     const fetchPage = async (queryParams) => {
@@ -30,9 +29,8 @@ export default class PaginationService extends Service {
       return await fetchPage(Object.fromEntries(searchParams));
     }
 
-    paginator = new Paginator(async () => {
-      if (first) {
-        first = false;
+    paginator = new Paginator(async (pageNumber) => {
+      if (pageNumber === 1) {
         return await fetchFirstPage();
       } else if (nextUrl) {
         return await fetchNextPage();

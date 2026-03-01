@@ -7,7 +7,6 @@ export default class ActivityTypesIndexRoute extends Route {
   model() {
     return {
       org: this.modelFor('orgs.org'),
-      activityTypes: this.store.query('activity-type', {}),
     };
   }
 }

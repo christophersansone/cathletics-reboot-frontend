@@ -131,7 +131,7 @@ export default class Atomic extends Service {
       }
       const updatedProperties = Object.keys(properties);
       if (serialized.data.attributes) {
-        model.eachAttribute((attrName, attrDefinition) => {
+        model.eachAttribute((attrName) => {
           if (!updatedProperties.includes(attrName)) {
             const serializedKey = serializer.keyForAttribute ? serializer.keyForAttribute(attrName, 'serialize') : attrName;
             delete serialized.data.attributes[serializedKey];
@@ -139,7 +139,7 @@ export default class Atomic extends Service {
         });
       }
       if (serialized.data.relationships) {
-        model.eachRelationship((attrName, attrDefinition) => {
+        model.eachRelationship((attrName) => {
           if (!updatedProperties.includes(attrName)) {
             const serializedKey = serializer.keyForRelationship ? serializer.keyForRelationship(attrName, 'serialize') : attrName;
             delete serialized.data.relationships[serializedKey];

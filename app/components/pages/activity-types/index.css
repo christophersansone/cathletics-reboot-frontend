@@ -54,3 +54,7 @@
   color: var(--color-text-secondary);
   font-size: 0.9375rem;
 }
+
+.errors {
+  margin-bottom: var(--space-4);
+}

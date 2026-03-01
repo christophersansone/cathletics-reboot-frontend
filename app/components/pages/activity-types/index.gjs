@@ -1,5 +1,5 @@
 import Component from '@glimmer/component';
-import { tracked } from '@glimmer/tracking';
+import { tracked, cached } from '@glimmer/tracking';
 import { action } from '@ember/object';
 import { service } from '@ember/service';
 import { on } from '@ember/modifier';
@@ -13,6 +13,7 @@ import Await from '../../await';
 import Errors from '../../errors';
 import args from 'frontend/decorators/args';
 import DeferredPromise from 'frontend/utils/deferred-promise';
+import Organization from 'frontend/models/organization';
 
 class Modal {
   atomic = null;
@@ -79,20 +80,24 @@ class CreateModal extends Modal {
 }
 
 @args({
-  org: { required: true },
-  activityTypes: { required: true },
+  org: { type: Organization, required: true },
 })
 export default class ActivityTypesIndexPage extends Component {
   @service store;
   @service atomic;
+  @service pagination;
 
   @tracked modal = null;
+
+  @cached
+  get paginator() {
+    return this.pagination.query('activity-type', {});
+  }
 
   editActivityType = task({ drop: true }, async (activityType) => {
     try {
       this.modal = new EditModal({ model: activityType, atomic: this.atomic });
-      await this.modal.promise;
-      return this.modal.result;
+      return await this.modal.promise;
     } finally {
       this.modal = null;
     }
@@ -101,8 +106,11 @@ export default class ActivityTypesIndexPage extends Component {
   createActivityType = task({ drop: true }, async () => {
     try {
       this.modal = new CreateModal({ organization: this.args.org, atomic: this.atomic });
-      await this.modal.promise;
-      return this.modal.result;
+      const result = await this.modal.promise;
+      if (result.model) {
+        await this.paginator.reload();
+      }
+      return result;
     } finally {
       this.modal = null;
     }
@@ -124,8 +132,8 @@ export default class ActivityTypesIndexPage extends Component {
       </UiButton>
     </div>
 
-    <Await @promise={{@activityTypes}} as |activityTypes|>
-      {{#if activityTypes.length}}
+    <Await @promise={{this.paginator.firstPage}} showLatest={{true}}>
+      {{#if this.paginator.displayItems.length}}
         <UiCard @padding={{false}}>
           <table class="data-table">
             <thead>
@@ -136,7 +144,7 @@ export default class ActivityTypesIndexPage extends Component {
               </tr>
             </thead>
             <tbody>
-              {{#each activityTypes as |at|}}
+              {{#each this.paginator.displayItems as |at|}}
                 <tr>
                   <td class="font-medium">{{at.name}}</td>
                   <td class="text-secondary">{{at.description}}</td>
@@ -158,7 +166,7 @@ export default class ActivityTypesIndexPage extends Component {
           <div class="empty-state">
             <p class="empty-state__message">No activity types yet</p>
             <p class="empty-state__hint">Create your first activity type to get started with seasons and leagues.</p>
-            <UiButton class="mt-4" {{on "click" this.openCreate}}>
+            <UiButton class="mt-4" {{on "click" this.createActivityType.perform}}>
               Create Activity Type
             </UiButton>
           </div>
@@ -168,7 +176,7 @@ export default class ActivityTypesIndexPage extends Component {
 
     {{#if this.modal}}
       <UiModal @title={{this.modal.title}} @onClose={{this.modal.cancel}}>
-        <Errors @error={{this.modal.saveTask.last.error}} />
+        <Errors @error={{this.modal.saveTask.last.error}} class="errors" />
         <ActivityTypeForm
           @activityType={{this.modal.trackedModel}}
           @onSave={{this.modal.save}}

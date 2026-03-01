@@ -60,7 +60,7 @@ export default class Paginator {
     if (!DISPLAY_TYPES.includes(displayType)) {
       throw new Error(`Invalid displayType: "${displayType}"`);
     }
-    this.firstPage = this.nextPage();
+    this.loadFirstPage();
   }
 
   // returns a promise resolving with the (first) set of records to display --
@@ -113,7 +113,7 @@ export default class Paginator {
     this.pagePromises = [];
     this.pages = [];
     this.hasMore = true;
-    this.firstPage = this.nextPage();
+    this.loadFirstPage();
   }
 
   @action
@@ -131,6 +131,17 @@ export default class Paginator {
   @action
   previousPage() {
     return this.navigateToPage(this.pageNumber - 1);
+  }
+
+  // the first page fetch must be handled in the next microtask to avoid
+  // tracked properties from being mutated twice (initial values to first page values) in the same run loop
+  loadFirstPage() {
+    let deferredResolve;
+    this.firstPage = new Promise((resolve) => deferredResolve = resolve);
+    queueMicrotask(async () => {
+      const result = await this.nextPage();
+      deferredResolve(result);
+    });
   }
 
   navigateToPageTask = task({ drop: true }, async (pageNumber) => {
