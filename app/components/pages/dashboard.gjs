@@ -1,5 +1,4 @@
 import UiCard from 'frontend/components/ui/card';
-import InfiniteScrollTest from 'frontend/components/infinite-scroll-test';
 
 <template>
   <div class="page-header">
@@ -28,5 +27,4 @@ import InfiniteScrollTest from 'frontend/components/infinite-scroll-test';
       <div class="stat-label">Active teams this season</div>
     </UiCard>
   </div>
-  <InfiniteScrollTest />
 </template>
