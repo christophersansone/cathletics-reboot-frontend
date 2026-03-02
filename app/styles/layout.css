@@ -4,15 +4,18 @@
       mobile:  < 640px
       tablet:  640px – 1023px
       desktop: >= 1024px
+
+    Layout: sidebar + main area.
+    The shell is exactly viewport height. The sidebar and topbar are fixed
+    in place (via flex, not position:fixed). Only .app-content scrolls.
   */
 
-  /* App shell with sidebar */
   .app-shell {
     display: flex;
-    min-height: 100dvh;
+    height: 100dvh;
   }
 
-  /* Sidebar — hidden on mobile, visible on desktop */
+  /* Sidebar — slide-in overlay on mobile, in-flow on desktop */
   .app-sidebar {
     width: var(--sidebar-width);
     background: var(--sidebar-bg);
@@ -91,14 +94,13 @@
     z-index: calc(var(--z-overlay) - 1);
   }
 
-  /* Main area */
+  /* Main area — fills remaining width, stacks topbar + content vertically */
   .app-main {
     flex: 1;
     display: flex;
     flex-direction: column;
     min-width: 0;
-    overflow-x: hidden;
-    width: 100%;
+    overflow: hidden;
   }
 
   .app-topbar {
@@ -108,14 +110,14 @@
     padding: var(--space-3) var(--space-4);
     border-bottom: 1px solid var(--color-border);
     background: var(--color-bg);
-    position: sticky;
-    top: 0;
-    z-index: var(--z-sticky);
+    flex-shrink: 0;
   }
 
+  /* The only element that scrolls */
   .app-content {
     flex: 1;
     padding: var(--space-4);
+    overflow-y: auto;
   }
 
   /* Centered layout (login, org selector) */

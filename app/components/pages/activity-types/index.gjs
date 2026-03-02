@@ -145,7 +145,7 @@ export default class ActivityTypesIndexPage extends Component {
             </tr>
           </thead>
           <tbody>
-            <InfiniteScroll @paginator={{this.paginator}} @occlude={{true}}>
+            <InfiniteScroll @paginator={{this.paginator}} @occlude={{true}} @scrollElement=".app-content">
               <:item as |item|>
                 <tr>
                   <td class="font-medium">{{item.name}}</td>

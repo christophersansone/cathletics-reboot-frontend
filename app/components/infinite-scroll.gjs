@@ -82,7 +82,14 @@ export default class InfiniteScroll extends Component {
   // Internal state for spatial tracking
   pageHeights = new Map();
   pageElements = new Map();
-  sentinelElement = null;
+  loadingSentinelElement = null;
+
+  @cached
+  get scrollElement() {
+    const arg = this.args.scrollElement;
+    if (typeof arg === 'string') return window.document.querySelector(arg);
+    return arg ?? null;
+  }
 
   @cached
   get pageIntersectionObserver() {
@@ -93,7 +100,7 @@ export default class InfiniteScroll extends Component {
         entries.forEach(entry => this.pageSentinelIntersected(entry));
       },
       {
-        root: this.args.scrollElement ?? null,
+        root: this.scrollElement,
         rootMargin: `${this.args.threshold ?? DEFAULT_THRESHOLD} 0px`,
         threshold: 0.01,
       }
@@ -186,7 +193,7 @@ export default class InfiniteScroll extends Component {
         }
       },
       {
-        root: this.args.scrollElement ?? null,
+        root: this.scrollElement,
         rootMargin: `${this.args.threshold ?? DEFAULT_THRESHOLD} 0px`,
         threshold: 0.01,
       }
