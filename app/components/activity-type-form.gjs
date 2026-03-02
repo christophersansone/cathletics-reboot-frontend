@@ -4,6 +4,7 @@ import { on } from '@ember/modifier';
 import { fn } from '@ember/helper';
 import UiInput from 'frontend/components/ui/input';
 import UiButton from 'frontend/components/ui/button';
+import autoFocus from 'frontend/modifiers/auto-focus';
 
 export default class ActivityTypeForm extends Component {
   @action
@@ -25,6 +26,7 @@ export default class ActivityTypeForm extends Component {
         @placeholder="e.g. Football, Choir, Book Club"
         @id="activity-type-name"
         {{on "input" (fn this.updateField "name")}}
+        {{autoFocus}}
       />
 
       <UiInput

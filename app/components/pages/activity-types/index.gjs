@@ -14,6 +14,8 @@ import Errors from '../../errors';
 import args from 'frontend/decorators/args';
 import DeferredPromise from 'frontend/utils/deferred-promise';
 import Organization from 'frontend/models/organization';
+import InfiniteScroll from '../../infinite-scroll';
+import LoadingIndicator from '../../ui/loading-indicator';
 
 class Modal {
   atomic = null;
@@ -133,45 +135,64 @@ export default class ActivityTypesIndexPage extends Component {
     </div>
 
     <Await @promise={{this.paginator.firstPage}} showLatest={{true}}>
-      {{#if this.paginator.displayItems.length}}
-        <UiCard @padding={{false}}>
-          <table class="data-table">
-            <thead>
-              <tr>
-                <th>Name</th>
-                <th>Description</th>
-                <th class="data-table__actions-col"></th>
-              </tr>
-            </thead>
-            <tbody>
-              {{#each this.paginator.displayItems as |at|}}
+      <UiCard @padding={{false}}>
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Description</th>
+              <th class="data-table__actions-col"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <InfiniteScroll @paginator={{this.paginator}} @occlude={{true}}>
+              <:item as |item|>
                 <tr>
-                  <td class="font-medium">{{at.name}}</td>
-                  <td class="text-secondary">{{at.description}}</td>
+                  <td class="font-medium">{{item.name}}</td>
+                  <td class="text-secondary">{{item.description}}</td>
                   <td class="data-table__actions">
-                    <UiButton @variant="ghost" @size="sm" {{on "click" (fn this.editActivityType.perform at)}}>
+                    <UiButton @variant="ghost" @size="sm" {{on "click" (fn this.editActivityType.perform item)}}>
                       Edit
                     </UiButton>
-                    <UiButton @variant="ghost" @size="sm" class="text-danger" {{on "click" (fn this.deleteActivityType.perform at)}}>
+                    <UiButton @variant="ghost" @size="sm" class="text-danger" {{on "click" (fn this.deleteActivityType.perform item)}}>
                       Delete
                     </UiButton>
                   </td>
                 </tr>
-              {{/each}}
-            </tbody>
-          </table>
-        </UiCard>
-      {{else}}
-        <UiCard>
-          <div class="empty-state">
-            <p class="empty-state__message">No activity types yet</p>
-            <p class="empty-state__hint">Create your first activity type to get started with seasons and leagues.</p>
-            <UiButton class="mt-4" {{on "click" this.createActivityType.perform}}>
-              Create Activity Type
-            </UiButton>
-          </div>
-        </UiCard>
-      {{/if}}
+              </:item>
+
+              <:sentinel as |sentinelModifier|>
+                <tr {{sentinelModifier}}>
+                  <td colspan="3" class="infinite-scroll-page-sentinel">
+                  </td>
+                </tr>
+              </:sentinel>
+
+              <:loading as |loadingModifier|>
+                <tr {{loadingModifier}}>
+                  <td colspan="3">
+                    <LoadingIndicator />
+                  </td>
+                </tr>
+              </:loading>
+
+              <:empty>
+                <tr>
+                  <td colspan="3">
+                    <div class="empty-state">
+                      <p class="empty-state__message">No activity types yet</p>
+                      <p class="empty-state__hint">Create your first activity type to get started with seasons and leagues.</p>
+                      <UiButton class="mt-4" {{on "click" this.createActivityType.perform}}>
+                        Create Activity Type
+                      </UiButton>
+                    </div>
+                  </td>
+                </tr>
+              </:empty>
+            </InfiniteScroll>
+          </tbody>
+        </table>
+      </UiCard>
     </Await>
 
     {{#if this.modal}}
