@@ -9,6 +9,7 @@ import SeasonForm from '../../season/form';
 import Errors from '../../errors';
 import args from 'frontend/decorators/args';
 import Breadcrumbs from '../../layout/breadcrumbs';
+import DetailHeader from '../../layout/detail-header';
 
 @args({
   season: { required: true },
@@ -38,9 +39,9 @@ export default class SeasonEditPage extends Component {
   <template>
     <Breadcrumbs />
 
-    <div class="detail-header">
-      <h1 class="detail-header__title">Edit Season</h1>
-    </div>
+    <DetailHeader>
+      <:title>Edit Season</:title>
+    </DetailHeader>
 
     <div class="form-page">
       <UiCard>

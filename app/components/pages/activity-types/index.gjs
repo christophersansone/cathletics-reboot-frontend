@@ -17,6 +17,7 @@ import DeferredPromise from 'frontend/utils/deferred-promise';
 import Organization from 'frontend/models/organization';
 import InfiniteScroll from '../../infinite-scroll';
 import LoadingIndicator from '../../ui/loading-indicator';
+import PageHeader from 'frontend/components/layout/page-header';
 
 class Modal {
   atomic = null;
@@ -125,15 +126,15 @@ export default class ActivityTypesIndexPage extends Component {
   });
 
   <template>
-    <div class="page-header flex items-center justify-between">
-      <div>
-        <h1 class="page-header__title">Activities</h1>
-        <p class="page-header__description">Manage activity types, seasons, and leagues</p>
-      </div>
-      <UiButton {{on "click" this.createActivityType.perform}}>
-        New Activity Type
-      </UiButton>
-    </div>
+    <PageHeader>
+      <:title>Activities</:title>
+      <:description>Manage activity types, seasons, and leagues</:description>
+      <:actions>
+        <UiButton {{on "click" this.createActivityType.perform}}>
+          New Activity Type
+        </UiButton>
+      </:actions>
+    </PageHeader>
 
     <Await @promise={{this.paginator.firstPage}} showLatest={{true}}>
       <UiCard @padding={{false}}>

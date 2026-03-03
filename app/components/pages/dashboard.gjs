@@ -1,10 +1,11 @@
 import UiCard from 'frontend/components/ui/card';
+import PageHeader from 'frontend/components/layout/page-header';
 
 <template>
-  <div class="page-header">
-    <h1 class="page-header__title">Dashboard</h1>
-    <p class="page-header__description">Overview of your organization's activities</p>
-  </div>
+  <PageHeader>
+    <:title>Dashboard</:title>
+    <:description>Overview of your organization's activities</:description>
+  </PageHeader>
 
   <div class="dashboard-grid">
     <UiCard @title="Active Seasons">

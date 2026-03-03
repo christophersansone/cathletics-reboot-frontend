@@ -1,0 +1,391 @@
+@layer app {
+  /* --------------------------------------------------
+    Global defaults
+    -------------------------------------------------- */
+
+  /* Disable the default global cross-fade */
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none;
+    mix-blend-mode: normal;
+  }
+
+  ::view-transition-group(*) {
+    animation-duration: 300ms;
+    animation-timing-function: ease;
+    overflow: hidden;
+  }
+
+  /* --------------------------------------------------
+    FADE
+    -------------------------------------------------- */
+
+  ::view-transition-old(fade) {
+    animation: vt-fade-out 300ms ease forwards;
+  }
+
+  ::view-transition-new(fade) {
+    animation: vt-fade-in 300ms ease forwards;
+  }
+
+  @keyframes vt-fade-in {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+  }
+
+  @keyframes vt-fade-out {
+    from { opacity: 1; }
+    to   { opacity: 0; }
+  }
+
+  /* --------------------------------------------------
+    SLIDE (horizontal)
+    -------------------------------------------------- */
+
+  /* Clip the slide transition */
+  ::view-transition-group(slide) {
+    overflow: hidden;
+  }
+
+  ::view-transition-old(slide) {
+    animation: vt-slide-out 600ms ease forwards;
+  }
+
+  ::view-transition-new(slide) {
+    animation: vt-slide-in 600ms ease forwards;
+  }
+
+  ::view-transition-group(slide-left) {
+    overflow: hidden;
+  }
+
+  ::view-transition-old(slide-left) {
+    animation: vt-slide-left-out 600ms ease forwards;
+  }
+
+  ::view-transition-new(slide-left) {
+    animation: vt-slide-left-in 600ms ease forwards;
+  }
+
+
+  @keyframes vt-slide-left-in {
+    from {
+      transform: translateX(100vw);
+      opacity: 0.7;
+    }
+
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes vt-slide-left-out {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+    }
+
+    to {
+      transform: translateX(-10vw);
+      opacity: 0.7;
+    }
+  }
+
+  /* --------------------------------------------------
+    SLIDE (horizontal)
+    -------------------------------------------------- */
+
+  /* Clip the slide transition */
+  ::view-transition-group(slide-right) {
+    overflow: hidden;
+  }
+
+  ::view-transition-old(slide-right) {
+    animation: vt-slide-right-out 600ms ease forwards;
+  }
+
+  ::view-transition-new(slide-right) {
+    animation: vt-slide-right-in 600ms ease forwards;
+  }
+
+  @keyframes vt-slide-right-out {
+    from {
+      transform: translateX(0);
+      opacity: 1;
+      z-index: 2;
+    }
+
+    to {
+      transform: translateX(100vw);
+      opacity: 1;
+      z-index: 2;
+    }
+  }
+
+  @keyframes vt-slide-right-in {
+    from {
+      transform: translateX(-10vw);
+      opacity: 0.7;
+    }
+
+    to {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+
+  /* --------------------------------------------------
+    SCALE / POP
+    -------------------------------------------------- */
+
+  ::view-transition-old(scale) {
+    animation: vt-scale-out 650ms ease forwards;
+  }
+
+  ::view-transition-new(scale) {
+    animation: vt-scale-in 650ms ease forwards;
+  }
+
+  @keyframes vt-scale-in {
+    from {
+      transform: scale(0.56);
+      opacity: 0;
+    }
+
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  @keyframes vt-scale-out {
+    from {
+      transform: scale(1);
+      opacity: 1;
+    }
+
+    to {
+      transform: scale(0.56);
+      opacity: 0;
+    }
+  }
+
+
+  /* SWIPE */
+
+  @keyframes vt-swipe-in {
+    from { transform: translateX(100%); }
+    to { transform: translateX(0); }
+  }
+
+  @keyframes vt-swipe-out {
+    from {
+      transform: translateX(0) scale(1);
+      opacity: 1;
+    }
+
+    to {
+      transform: translateX(-20%) scale(0.95);
+      opacity: 0.3;
+    }
+  }
+
+  ::view-transition-old(swipe) > * {
+    animation: 400ms cubic-bezier(0.3, 0, 0.2, 1) both vt-swipe-out;
+    z-index: 1;
+  }
+
+  ::view-transition-new(swipe) > * {
+    animation: 400ms cubic-bezier(0.3, 0, 0.2, 1) both vt-swipe-in;
+    z-index: 2;
+    box-shadow: -5px 0 25px rgb(0 0 0 / 15%);
+  }
+
+  /* DISSOLVE */
+
+  ::view-transition-old(dissolve) {
+    animation: 200ms ease-out both vt-fade-out;
+  }
+
+  ::view-transition-new(dissolve) {
+    animation: 300ms ease-in both vt-fade-in,
+              300ms ease-out both scale-up;
+  }
+
+  @keyframes scale-up {
+    from { transform: scale(0.98); }
+    to { transform: scale(1); }
+  }
+
+
+  /* FLIP */
+
+  /* Ensure the transition container has perspective */
+  ::view-transition-group(card-flip) {
+    perspective: 1000px;
+  }
+
+  ::view-transition-old(card-flip) {
+    animation: 600ms cubic-bezier(0.4, 0, 0.2, 1) both vt-flip-out;
+    backface-visibility: hidden;
+  }
+
+  ::view-transition-new(card-flip) {
+    animation: 600ms cubic-bezier(0.4, 0, 0.2, 1) both vt-flip-in;
+    backface-visibility: hidden;
+  }
+
+  @keyframes vt-flip-out {
+    from {
+      transform: rotateY(0);
+      opacity: 1;
+    }
+
+    to {
+      transform: rotateY(-180deg);
+      opacity: 0;
+    }
+  }
+
+  @keyframes vt-flip-in {
+    from {
+      transform: rotateY(180deg);
+      opacity: 0;
+    }
+
+    to {
+      transform: rotateY(0);
+      opacity: 1;
+    }
+  }
+
+  /* SHEET (bottom to top) */
+
+  ::view-transition-new(sheet) {
+    animation: 500ms cubic-bezier(0.32, 0.72, 0, 1) both vt-sheet-in;
+    z-index: 2;
+  }
+
+  ::view-transition-old(sheet) {
+    animation: 500ms linear both vt-sheet-out;
+    z-index: 1;
+  }
+
+  @keyframes vt-sheet-in {
+    from { transform: translateY(100%); }
+    to { transform: translateY(0); }
+  }
+
+  @keyframes vt-sheet-out {
+    from { filter: brightness(1); }
+    to { filter: brightness(0.7); }
+  }
+
+
+
+  /* IF TRANSITIONS */
+
+  ::view-transition-group(vt-if-pop) {
+    animation-duration: 300ms;
+    animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  /* Entering: Pop Up */
+  ::view-transition-new(vt-if-pop) {
+    animation: vt-if-pop-in 300ms both;
+  }
+
+  /* Leaving: Pop Down */
+  ::view-transition-old(vt-if-pop) {
+    animation: vt-if-pop-out 300ms both;
+  }
+
+  @keyframes vt-if-pop-in {
+    from {
+      transform: scale(0.8);
+      opacity: 0;
+    }
+
+    to {
+      transform: scale(1);
+      opacity: 1;
+    }
+  }
+
+  @keyframes vt-if-pop-out {
+    from {
+      transform: scale(1);
+      opacity: 1;
+    }
+
+    to {
+      transform: scale(0.8);
+      opacity: 0;
+    }
+  }
+
+  /* Container must have view-transition-name: presence-toggle; */
+
+  ::view-transition-group(vt-if-slide-up) {
+    animation-duration: 400ms;
+    animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+  }
+
+  /* Entering: Slide UP from bottom */
+  ::view-transition-new(vt-if-slide-up) {
+    animation: vt-if-slide-up-in 400ms both;
+  }
+
+  /* Leaving: Slide DOWN to bottom */
+  ::view-transition-old(vt-if-slide-up) {
+    animation: vt-if-slide-up-out 400ms both;
+  }
+
+  @keyframes vt-if-slide-up-in {
+    from {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  @keyframes vt-if-slide-up-out {
+    from {
+      transform: translateY(0);
+      opacity: 1;
+    }
+
+    to {
+      transform: translateY(100%);
+      opacity: 0;
+    }
+  }
+
+  ::view-transition-group(vt-if-fade) {
+    animation-duration: 350ms;
+    animation-timing-function: ease-in-out;
+  }
+
+  ::view-transition-new(vt-if-fade) {
+    animation: vt-if-fade-in 200ms ease-out, vt-if-fade-in 350ms ease-out;
+  }
+
+  ::view-transition-old(vt-if-fade) {
+    animation: vt-if-fade-out 200ms ease-in, vt-if-fade-out 350ms ease-in;
+  }
+
+  @keyframes vt-if-fade-in {
+    from { opacity: 0.8; }
+    to { opacity: 1; }
+  }
+
+  @keyframes vt-if-fade-out {
+    from { opacity: 1; }
+    to { opacity: 0.8; }
+  }
+}

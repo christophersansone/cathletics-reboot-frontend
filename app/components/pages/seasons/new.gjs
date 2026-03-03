@@ -9,6 +9,7 @@ import SeasonForm from '../../season/form';
 import Errors from '../../errors';
 import args from 'frontend/decorators/args';
 import Breadcrumbs from '../../layout/breadcrumbs';
+import DetailHeader from '../../layout/detail-header';
 
 @args({
   activityType: { required: true },
@@ -41,10 +42,10 @@ export default class SeasonsNewPage extends Component {
   <template>
     <Breadcrumbs />
 
-    <div class="detail-header">
-      <h1 class="detail-header__title">New Season</h1>
-      <p class="detail-header__description">Create a season for {{@activityType.name}}</p>
-    </div>
+    <DetailHeader>
+      <:title>New Season</:title>
+      <:description>Create a season for {{@activityType.name}}</:description>
+    </DetailHeader>
 
     <div class="form-page">
       <UiCard>

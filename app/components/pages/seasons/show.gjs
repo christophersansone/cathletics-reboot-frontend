@@ -16,6 +16,7 @@ import FormattedTime from '../../formatted-time';
 import formatDate from 'frontend/helpers/format-date';
 import args from 'frontend/decorators/args';
 import Breadcrumbs from '../../layout/breadcrumbs';
+import DetailHeader from '../../layout/detail-header';
 
 @args({
   season: { required: true },
@@ -47,48 +48,37 @@ export default class SeasonShowPage extends Component {
   <template>
     <Breadcrumbs />
 
-    <div class="detail-header">
-      <div class="detail-header__top">
-        <div>
-          <h1 class="detail-header__title">{{@season.name}}</h1>
-        </div>
-        <div class="detail-header__actions">
-          <LinkTo @route="orgs.org.seasons.season.edit" @models={{array @org.slug @season.id}}>
-            <UiButton @variant="ghost" @size="sm">Edit</UiButton>
-          </LinkTo>
-          <UiButton @variant="ghost" @size="sm" class="text-danger" {{on "click" this.deleteSeason.perform}}>
-            Delete
-          </UiButton>
-        </div>
-      </div>
+    <DetailHeader>
+      <:title>{{@season.name}}</:title>
+      <:description>Create a season for {{@activityType.name}}</:description>
 
-      <div class="detail-meta">
-        {{#if @season.startDate}}
-          <div class="detail-meta__item">
-            <span class="detail-meta__label">Season Dates</span>
-            <span>{{formatDate @season.startDate}} — {{formatDate @season.endDate}}</span>
-          </div>
-        {{/if}}
-        {{#if @season.registrationStartAt}}
-          <div class="detail-meta__item">
-            <span class="detail-meta__label">Registration Window</span>
-            <span>
-              <FormattedTime @value={{@season.registrationStartAt}} @zone={{@season.effectiveTimeZone}} />
-              —
-              <FormattedTime @value={{@season.registrationEndAt}} @zone={{@season.effectiveTimeZone}} />
-            </span>
-          </div>
-        {{/if}}
-        <div class="detail-meta__item">
-          <span class="detail-meta__label">Registration</span>
+      <:actions>
+        <LinkTo @route="orgs.org.seasons.season.edit" @models={{array @org.slug @season.id}}>
+          <UiButton @variant="ghost" @size="sm">Edit</UiButton>
+        </LinkTo>
+        <UiButton @variant="ghost" @size="sm" class="text-danger" {{on "click" this.deleteSeason.perform}}>
+          Delete
+        </UiButton>
+      </:actions>
+
+      <:meta as |Meta|>
+        <Meta @label="Season Dates" @if={{@season.startDate}}>
+          {{formatDate @season.startDate}} — {{formatDate @season.endDate}}
+        </Meta>
+        <Meta @label="Registration Window" @if={{@season.registrationStartAt}}>
+          <FormattedTime @value={{@season.registrationStartAt}} @zone={{@season.effectiveTimeZone}} />
+          —
+          <FormattedTime @value={{@season.registrationEndAt}} @zone={{@season.effectiveTimeZone}} />
+        </Meta>
+        <Meta @label="Registration">
           {{#if @season.registrationOpen}}
             <UiBadge @variant="success">Open</UiBadge>
           {{else}}
             <UiBadge @variant="default">Closed</UiBadge>
           {{/if}}
-        </div>
-      </div>
-    </div>
+        </Meta>
+      </:meta>
+    </DetailHeader>
 
     <div class="section-header">
       <h2 class="section-header__title">Leagues</h2>

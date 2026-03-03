@@ -11,6 +11,9 @@ import UiBadge from '../../ui/badge';
 import formatDate from 'frontend/helpers/format-date';
 import args from 'frontend/decorators/args';
 import Breadcrumbs from '../../layout/breadcrumbs';
+import viewTransitionName from 'frontend/modifiers/view-transition-name';
+import DetailHeader from '../../layout/detail-header';
+
 
 function gradeLabel(grade) {
   const g = Number(grade);
@@ -68,61 +71,35 @@ export default class LeagueShowPage extends Component {
   <template>
     <Breadcrumbs />
 
-    <div class="detail-header">
-      <div class="detail-header__top">
-        <div>
-          <h1 class="detail-header__title">{{this.displayName}}</h1>
-        </div>
-        <div class="detail-header__actions">
-          <LinkTo @route="orgs.org.leagues.league.edit" @models={{array @org.slug @league.id}}>
-            <UiButton @variant="ghost" @size="sm">Edit</UiButton>
-          </LinkTo>
-          <UiButton @variant="ghost" @size="sm" class="text-danger" {{on "click" this.deleteLeague.perform}}>
-            Delete
-          </UiButton>
-        </div>
-      </div>
-
-      <div class="detail-meta">
-        {{#if @league.gender}}
-          <div class="detail-meta__item">
-            <span class="detail-meta__label">Gender</span>
-            <span>{{@league.gender}}</span>
-          </div>
-        {{/if}}
-        {{#if this.gradeRange}}
-          <div class="detail-meta__item">
-            <span class="detail-meta__label">Grades</span>
-            <span>{{this.gradeRange}}</span>
-          </div>
-        {{/if}}
-        {{#if this.ageRange}}
-          <div class="detail-meta__item">
-            <span class="detail-meta__label">Ages</span>
-            <span>{{this.ageRange}}</span>
-          </div>
-        {{/if}}
-        {{#if @league.ageCutoffDate}}
-          <div class="detail-meta__item">
-            <span class="detail-meta__label">Age Cutoff Date</span>
-            <span>{{formatDate @league.ageCutoffDate}}</span>
-          </div>
-        {{/if}}
-        <div class="detail-meta__item">
-          <span class="detail-meta__label">Capacity</span>
-          <span>
-            {{#if @league.capacity}}
-              {{@league.capacity}}
-              {{#if @league.full}}
-                <UiBadge @variant="warning">Full</UiBadge>
-              {{/if}}
-            {{else}}
-              Unlimited
+    <DetailHeader>
+      <:title>{{this.displayName}}</:title>
+      <:actions>
+        <LinkTo @route="orgs.org.leagues.league.edit" @models={{array @org.slug @league.id}}>
+          <UiButton @variant="ghost" @size="sm">Edit</UiButton>
+        </LinkTo>
+        <UiButton @variant="ghost" @size="sm" class="text-danger" {{on "click" this.deleteLeague.perform}}>
+          Delete
+        </UiButton>
+      </:actions>
+      <:meta as |Meta|>
+        <Meta @label="Gender" @value={{@league.gender}} />
+        <Meta @label="Grades" @value={{this.gradeRange}} />
+        <Meta @label="Ages" @value={{this.ageRange}} />
+        <Meta @label="Age Cutoff Date" @if={{@league.ageCutoffDate}}>
+          {{formatDate @league.ageCutoffDate}}
+        </Meta>
+        <Meta @label="Capacity">
+          {{#if @league.capacity}}
+            {{@league.capacity}}
+            {{#if @league.full}}
+              <UiBadge @variant="warning">Full</UiBadge>
             {{/if}}
-          </span>
-        </div>
-      </div>
-    </div>
+          {{else}}
+            Unlimited
+          {{/if}}
+        </Meta>
+      </:meta>
+    </DetailHeader>
 
     <div class="section-header">
       <h2 class="section-header__title">Teams</h2>

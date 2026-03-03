@@ -9,6 +9,7 @@ import LeagueForm from '../../league/form';
 import Errors from '../../errors';
 import args from 'frontend/decorators/args';
 import Breadcrumbs from '../../layout/breadcrumbs';
+import DetailHeader from '../../layout/detail-header';
 
 @args({
   season: { required: true },
@@ -38,10 +39,10 @@ export default class LeaguesNewPage extends Component {
   <template>
     <Breadcrumbs />
 
-    <div class="detail-header">
-      <h1 class="detail-header__title">New League</h1>
-      <p class="detail-header__description">Create a league for {{@season.name}}</p>
-    </div>
+    <DetailHeader>
+      <:title>New League</:title>
+      <:description>Create a league for {{@season.name}}</:description>
+    </DetailHeader>
 
     <div class="form-page">
       <UiCard>

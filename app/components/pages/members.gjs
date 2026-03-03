@@ -1,10 +1,8 @@
-import Component from '@glimmer/component';
+import PageHeader from 'frontend/components/layout/page-header';
 
-export default class MembersPage extends Component {
-  <template>
-    <div class="page-header">
-      <h1 class="page-header__title">Members</h1>
-      <p class="page-header__description">Manage organization members and roles</p>
-    </div>
-  </template>
-}
+<template>
+  <PageHeader>
+    <:title>Members</:title>
+    <:description>Manage organization members and roles</:description>
+  </PageHeader>
+</template>

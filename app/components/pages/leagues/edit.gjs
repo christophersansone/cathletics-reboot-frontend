@@ -10,6 +10,7 @@ import LeagueForm from '../../league/form';
 import Errors from '../../errors';
 import args from 'frontend/decorators/args';
 import Breadcrumbs from 'frontend/components/layout/breadcrumbs';
+import DetailHeader from '../../layout/detail-header';
 
 @args({
   league: { required: true },
@@ -40,9 +41,9 @@ export default class LeagueEditPage extends Component {
   <template>
     <Breadcrumbs />
 
-    <div class="detail-header">
-      <h1 class="detail-header__title">Edit League</h1>
-    </div>
+    <DetailHeader>
+      <:title>Edit League</:title>
+    </DetailHeader>
 
     <div class="form-page">
       <UiCard>

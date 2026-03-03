@@ -4,6 +4,7 @@ import { action } from '@ember/object';
 import { service } from '@ember/service';
 import { on } from '@ember/modifier';
 import { LinkTo } from '@ember/routing';
+import routerViewTransition from 'frontend/modifiers/router-view-transition';
 
 export default class OrgShell extends Component {
   @service session;
@@ -88,9 +89,11 @@ export default class OrgShell extends Component {
           </div>
         </header>
 
-        <main class="app-content">
-          {{yield}}
-        </main>
+        <div id="router-view-transition-container" {{routerViewTransition}}>
+          <main class="app-content">
+            {{yield}}
+          </main>
+        </div>
       </div>
     </div>
   </template>

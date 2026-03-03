@@ -18,6 +18,7 @@ import LoadingIndicator from '../../ui/loading-indicator';
 import args from 'frontend/decorators/args';
 import DeferredPromise from 'frontend/utils/deferred-promise';
 import Breadcrumbs from 'frontend/components/layout/breadcrumbs';
+import DetailHeader from 'frontend/components/layout/detail-header';
 
 class EditModal {
   trackedModel = null;
@@ -82,24 +83,18 @@ export default class ActivityTypeShowPage extends Component {
   <template>
     <Breadcrumbs />
 
-    <div class="detail-header">
-      <div class="detail-header__top">
-        <div>
-          <h1 class="detail-header__title">{{@activityType.name}}</h1>
-          {{#if @activityType.description}}
-            <p class="detail-header__description">{{@activityType.description}}</p>
-          {{/if}}
-        </div>
-        <div class="detail-header__actions">
-          <UiButton @variant="ghost" @size="sm" {{on "click" this.editActivityType.perform}}>
-            Edit
-          </UiButton>
-          <UiButton @variant="ghost" @size="sm" class="text-danger" {{on "click" this.deleteActivityType.perform}}>
-            Delete
-          </UiButton>
-        </div>
-      </div>
-    </div>
+    <DetailHeader>
+      <:title>{{@activityType.name}}</:title>
+      <:description>{{@activityType.description}}</:description>
+      <:actions>
+        <UiButton @variant="ghost" @size="sm" {{on "click" this.editActivityType.perform}}>
+          Edit
+        </UiButton>
+        <UiButton @variant="ghost" @size="sm" class="text-danger" {{on "click" this.deleteActivityType.perform}}>
+          Delete
+        </UiButton>
+      </:actions>
+    </DetailHeader>
 
     <div class="section-header">
       <h2 class="section-header__title">Seasons</h2>

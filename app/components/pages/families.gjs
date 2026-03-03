@@ -1,10 +1,8 @@
-import Component from '@glimmer/component';
+import PageHeader from 'frontend/components/layout/page-header';
 
-export default class FamiliesPage extends Component {
-  <template>
-    <div class="page-header">
-      <h1 class="page-header__title">Families</h1>
-      <p class="page-header__description">View and manage family units</p>
-    </div>
-  </template>
-}
+<template>
+  <PageHeader>
+    <:title>Families</:title>
+    <:description>View and manage family units</:description>
+  </PageHeader>
+</template>

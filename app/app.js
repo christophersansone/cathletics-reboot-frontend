@@ -27,3 +27,4 @@ import './styles/reset.css';
 import './styles/typography.css';
 import './styles/utilities.css';
 import './styles/variables.css';
+import './styles/view-transitions.css';
