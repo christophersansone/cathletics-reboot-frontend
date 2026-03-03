@@ -1,0 +1,17 @@
+.formatted-time {
+  display: inline;
+}
+
+.formatted-time__zone {
+  margin-left: var(--space-1);
+  font-size: 0.8125em;
+  font-weight: 500;
+  color: var(--color-text-secondary);
+}
+
+.formatted-time__local {
+  margin-left: var(--space-1);
+  font-size: 0.8125em;
+  color: var(--color-text-secondary);
+  font-style: italic;
+}

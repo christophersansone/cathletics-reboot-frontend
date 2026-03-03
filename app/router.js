@@ -14,9 +14,18 @@ Router.map(function () {
       this.route('dashboard');
       this.route('activity-types', function () {
         this.route('activity-type', { path: ':activity_type_id' }, function () {
-          this.route('seasons', function () {
-            this.route('season', { path: ':season_id' });
-          });
+          this.route('new-season');
+        });
+      });
+      this.route('seasons', function () {
+        this.route('season', { path: ':season_id' }, function () {
+          this.route('edit');
+          this.route('new-league');
+        });
+      });
+      this.route('leagues', function () {
+        this.route('league', { path: ':league_id' }, function () {
+          this.route('edit');
         });
       });
       this.route('members');

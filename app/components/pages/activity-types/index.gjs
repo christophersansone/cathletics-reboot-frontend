@@ -3,12 +3,13 @@ import { tracked, cached } from '@glimmer/tracking';
 import { action } from '@ember/object';
 import { service } from '@ember/service';
 import { on } from '@ember/modifier';
-import { fn } from '@ember/helper';
+import { fn, array } from '@ember/helper';
 import { task } from 'ember-concurrency';
+import { LinkTo } from '@ember/routing';
 import UiButton from '../../ui/button';
 import UiCard from '../../ui/card';
 import UiModal from '../../ui/modal';
-import ActivityTypeForm from '../../activity-type-form';
+import ActivityTypeForm from '../../activity-type/form';
 import Await from '../../await';
 import Errors from '../../errors';
 import args from 'frontend/decorators/args';
@@ -148,7 +149,11 @@ export default class ActivityTypesIndexPage extends Component {
             <InfiniteScroll @paginator={{this.paginator}} @occlude={{true}} @scrollElement=".app-content">
               <:item as |item|>
                 <tr>
-                  <td class="font-medium">{{item.name}}</td>
+                  <td class="font-medium">
+                    <LinkTo @route="orgs.org.activity-types.activity-type" @models={{array @org.slug item.id}} class="text-link">
+                      {{item.name}}
+                    </LinkTo>
+                  </td>
                   <td class="text-secondary">{{item.description}}</td>
                   <td class="data-table__actions">
                     <UiButton @variant="ghost" @size="sm" {{on "click" (fn this.editActivityType.perform item)}}>

@@ -7,5 +7,43 @@
 @import './buttons.css';
 
 @layer app {
+  .data-table {
+    width: 100%;
+    text-align: left;
+    font-size: 0.9375rem;
+  }
 
+  .data-table th {
+    padding: var(--space-3) var(--space-4);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--color-text-secondary);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .data-table td {
+    padding: var(--space-3) var(--space-4);
+    border-bottom: 1px solid var(--color-border);
+  }
+
+  .data-table tbody tr:last-child td {
+    border-bottom: none;
+  }
+
+  .data-table tbody tr:hover {
+    background: var(--color-bg-sunken);
+  }
+
+  .data-table__actions-col {
+    width: 1%;
+    white-space: nowrap;
+  }
+
+  .data-table__actions {
+    display: flex;
+    gap: var(--space-1);
+    justify-content: flex-end;
+  }
 }

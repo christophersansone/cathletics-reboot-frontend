@@ -19,6 +19,14 @@
   .text-warning { color: var(--color-warning); }
   .text-danger { color: var(--color-danger); }
 
+  .text-link {
+    color: var(--color-primary);
+    text-decoration: none;
+  }
+  .text-link:hover {
+    text-decoration: underline;
+  }
+
   .font-medium { font-weight: 500; }
   .font-semibold { font-weight: 600; }
   .font-bold { font-weight: 700; }
