@@ -1,4 +1,4 @@
-import PageHeader from 'frontend/components/layout/page-header';
+import { PageHeader } from 'frontend/components/layout';
 
 <template>
   <PageHeader>

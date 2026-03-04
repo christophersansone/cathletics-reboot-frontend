@@ -1,14 +1,8 @@
 import Component from '@glimmer/component';
-import { tracked, cached } from '@glimmer/tracking';
-import { on } from '@ember/modifier';
-import { fn } from '@ember/helper';
+import { tracked, cached, on, fn, or, Await, LoadingIndicator, args } from 'frontend/utils/stdlib';
 import { modifier } from 'ember-modifier';
-import args from 'frontend/decorators/args';
 import { task, timeout } from 'ember-concurrency';
-import Await from 'frontend/components/await';
 import { get } from '@ember/object';
-import { or } from 'ember-truth-helpers';
-import LoadingIndicator from './loading-indicator';
 
 /**
  * A simple "click outside" modifier to close the menu

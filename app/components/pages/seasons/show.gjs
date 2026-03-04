@@ -1,22 +1,11 @@
 import Component from '@glimmer/component';
-import { cached } from '@glimmer/tracking';
-import { service } from '@ember/service';
-import { on } from '@ember/modifier';
-import { array } from '@ember/helper';
+import { cached, service, on, array, LinkTo, or, Await, LoadingIndicator, args } from 'frontend/utils/stdlib';
 import { task } from 'ember-concurrency';
-import { LinkTo } from '@ember/routing';
-import { or } from 'ember-truth-helpers';
-import UiButton from '../../ui/button';
-import UiCard from '../../ui/card';
-import UiBadge from '../../ui/badge';
-import Await from '../../await';
+import { UiButton, UiCard, UiBadge } from 'frontend/components/ui';
 import InfiniteScroll from '../../infinite-scroll';
-import LoadingIndicator from '../../ui/loading-indicator';
 import FormattedTime from '../../formatted-time';
 import formatDate from 'frontend/helpers/format-date';
-import args from 'frontend/decorators/args';
-import Breadcrumbs from '../../layout/breadcrumbs';
-import DetailHeader from '../../layout/detail-header';
+import { Breadcrumbs, DetailHeader } from 'frontend/components/layout';
 
 @args({
   season: { required: true },

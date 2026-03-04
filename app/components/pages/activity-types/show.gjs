@@ -1,24 +1,10 @@
 import Component from '@glimmer/component';
-import { tracked, cached } from '@glimmer/tracking';
-import { action } from '@ember/object';
-import { service } from '@ember/service';
-import { on } from '@ember/modifier';
-import { array } from '@ember/helper';
+import { tracked, cached, action, service, on, array, LinkTo, Await, Errors, LoadingIndicator, args, DeferredPromise } from 'frontend/utils/stdlib';
 import { task } from 'ember-concurrency';
-import { LinkTo } from '@ember/routing';
-import UiButton from '../../ui/button';
-import UiCard from '../../ui/card';
-import UiModal from '../../ui/modal';
-import UiBadge from '../../ui/badge';
+import { UiButton, UiCard, UiModal, UiBadge } from 'frontend/components/ui';
 import ActivityTypeForm from '../../activity-type/form';
-import Await from '../../await';
-import Errors from '../../errors';
 import InfiniteScroll from '../../infinite-scroll';
-import LoadingIndicator from '../../ui/loading-indicator';
-import args from 'frontend/decorators/args';
-import DeferredPromise from 'frontend/utils/deferred-promise';
-import Breadcrumbs from 'frontend/components/layout/breadcrumbs';
-import DetailHeader from 'frontend/components/layout/detail-header';
+import { Breadcrumbs, DetailHeader } from 'frontend/components/layout';
 
 class EditModal {
   trackedModel = null;

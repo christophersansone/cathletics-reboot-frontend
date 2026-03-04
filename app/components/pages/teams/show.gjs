@@ -1,26 +1,9 @@
 import Component from '@glimmer/component';
-import { tracked, cached } from '@glimmer/tracking';
-import { action } from '@ember/object';
-import { service } from '@ember/service';
-import { on } from '@ember/modifier';
-import { fn, array } from '@ember/helper';
+import { tracked, cached, action, service, on, fn, array, LinkTo, eq, Await, Errors, LoadingIndicator, args, DeferredPromise } from 'frontend/utils/stdlib';
 import { task } from 'ember-concurrency';
-import { LinkTo } from '@ember/routing';
-import { eq } from 'ember-truth-helpers';
-import UiButton from '../../ui/button';
-import UiCard from '../../ui/card';
-import UiBadge from '../../ui/badge';
-import UiModal from '../../ui/modal';
-import UiSelect from '../../ui/select';
-import TypeableSelect from '../../ui/typeable-select';
-import Await from '../../await';
-import Errors from '../../errors';
+import { UiButton, UiCard, UiBadge, UiModal, UiSelect, UiTypeableSelect } from 'frontend/components/ui';
 import InfiniteScroll from '../../infinite-scroll';
-import LoadingIndicator from '../../ui/loading-indicator';
-import args from 'frontend/decorators/args';
-import DeferredPromise from 'frontend/utils/deferred-promise';
-import Breadcrumbs from '../../layout/breadcrumbs';
-import DetailHeader from '../../layout/detail-header';
+import { Breadcrumbs, DetailHeader } from 'frontend/components/layout';
 
 const ROLE_OPTIONS = ['player', 'coach', 'assistant_coach', 'manager'];
 
@@ -254,7 +237,7 @@ export default class TeamShowPage extends Component {
         <form class="flex flex-col gap-4" {{on "submit" this.preventAndSave}}>
           <div class="form-group">
             <label class="form-label">Member</label>
-            <TypeableSelect
+            <UiTypeableSelect
               @options={{array}}
               @selected={{this.modal.selectedUser}}
               @path="fullName"

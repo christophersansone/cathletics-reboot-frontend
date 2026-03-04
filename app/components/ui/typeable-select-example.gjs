@@ -1,7 +1,6 @@
-import TypeableSelect from 'frontend/components/ui/typeable-select';
 import Component from '@glimmer/component';
-import { tracked } from '@glimmer/tracking';
-import { action } from '@ember/object';
+import { tracked, action } from 'frontend/utils/stdlib';
+import { UiTypeableSelect } from 'frontend/components/ui';
 
 const OPTIONS = [ { name: 'Tom' }, { name: 'Dave' }, { name: 'Stephen' } ];
 
@@ -20,6 +19,6 @@ export default class TypeableSelectExampleComponent extends Component {
   }
 
   <template>
-    <TypeableSelect @options={{OPTIONS}} @path="name" @selected={{this.selected}} @onChange={{this.changed}} @onSearch={{this.search}} />
+    <UiTypeableSelect @options={{OPTIONS}} @path="name" @selected={{this.selected}} @onChange={{this.changed}} @onSearch={{this.search}} />
   </template>
 }

@@ -1,16 +1,9 @@
 import Component from '@glimmer/component';
-import { cached } from '@glimmer/tracking';
-import { service } from '@ember/service';
-import { array } from '@ember/helper';
+import { cached, service, Errors, args } from 'frontend/utils/stdlib';
 import { task } from 'ember-concurrency';
-import { LinkTo } from '@ember/routing';
-import { or } from 'ember-truth-helpers';
-import UiCard from '../../ui/card';
+import { UiCard } from 'frontend/components/ui';
 import LeagueForm from '../../league/form';
-import Errors from '../../errors';
-import args from 'frontend/decorators/args';
-import Breadcrumbs from 'frontend/components/layout/breadcrumbs';
-import DetailHeader from '../../layout/detail-header';
+import { Breadcrumbs, DetailHeader } from 'frontend/components/layout';
 
 @args({
   league: { required: true },

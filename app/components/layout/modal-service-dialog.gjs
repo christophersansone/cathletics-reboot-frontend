@@ -1,10 +1,6 @@
 import Component from '@glimmer/component';
-import { service } from '@ember/service';
-import { on } from '@ember/modifier';
-import { fn } from '@ember/helper';
-import { action } from '@ember/object';
-import UiModal from 'frontend/components/ui/modal';
-import UiButton from 'frontend/components/ui/button';
+import { service, on, fn, action } from 'frontend/utils/stdlib';
+import { UiModal, UiButton } from 'frontend/components/ui';
 
 export default class ModalServiceDialogComponent extends Component {
   @service modal;

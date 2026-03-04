@@ -1,0 +1,20 @@
+{
+  // 1. Automatically fix and organize imports on every save
+  "editor.codeActionsOnSave": {
+    "source.organizeImports": "explicit"
+  },
+
+  // 2. Make sure Cursor knows to look for imports as you type
+  "javascript.suggest.autoImports": true,
+  "typescript.suggest.autoImports": true,
+
+  // 3. Prefer absolute app paths (my-app/components/...) over relative (../../)
+  "javascript.preferences.importModuleSpecifier": "non-relative",
+  "typescript.preferences.importModuleSpecifier": "non-relative",
+
+  // 4. Ensure .gjs and .gts files are treated as Javascript/Typescript
+  "files.associations": {
+    "*.gjs": "javascript",
+    "*.gts": "typescript"
+  }
+}

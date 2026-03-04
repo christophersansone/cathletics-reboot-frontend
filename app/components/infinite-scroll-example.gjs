@@ -1,5 +1,5 @@
 import Component from '@glimmer/component';
-import { cached } from '@glimmer/tracking';
+import { cached } from 'frontend/utils/stdlib';
 import Paginator from 'frontend/utils/paginator';
 import InfiniteScroll from 'frontend/components/infinite-scroll';
 

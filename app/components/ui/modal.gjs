@@ -1,7 +1,5 @@
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
-import { on } from '@ember/modifier';
-import args from 'frontend/decorators/args';
+import { action, on, args } from 'frontend/utils/stdlib';
 import { task, timeout } from 'ember-concurrency';
 
 @args({

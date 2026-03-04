@@ -1,8 +1,6 @@
 import Component from '@glimmer/component';
-import { LinkTo } from '@ember/routing';
-import UiCard from 'frontend/components/ui/card';
-import UiBadge from 'frontend/components/ui/badge';
-import { eq } from 'ember-truth-helpers';
+import { LinkTo, eq } from 'frontend/utils/stdlib';
+import { UiCard, UiBadge } from 'frontend/components/ui';
 
 export default class OrgSelectorPage extends Component {
   <template>

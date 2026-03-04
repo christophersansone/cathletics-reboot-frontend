@@ -1,9 +1,6 @@
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
-import { on } from '@ember/modifier';
-import { fn } from '@ember/helper';
-import UiInput from 'frontend/components/ui/input';
-import UiButton from 'frontend/components/ui/button';
+import { action, on, fn } from 'frontend/utils/stdlib';
+import { UiInput, UiButton } from 'frontend/components/ui';
 import autoFocus from 'frontend/modifiers/auto-focus';
 import { toLocalInputValue, fromLocalInputValue } from 'frontend/utils/datetime';
 import { DateTime } from 'luxon';

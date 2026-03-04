@@ -1,10 +1,6 @@
 import Component from '@glimmer/component';
-import { action } from '@ember/object';
-import { on } from '@ember/modifier';
-import { fn } from '@ember/helper';
-import { eq } from 'ember-truth-helpers';
-import UiInput from 'frontend/components/ui/input';
-import UiButton from 'frontend/components/ui/button';
+import { action, on, fn, eq } from 'frontend/utils/stdlib';
+import { UiInput, UiButton } from 'frontend/components/ui';
 import autoFocus from 'frontend/modifiers/auto-focus';
 
 export default class LeagueForm extends Component {

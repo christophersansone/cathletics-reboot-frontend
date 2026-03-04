@@ -1,11 +1,6 @@
 import Component from '@glimmer/component';
-import { tracked } from '@glimmer/tracking';
-import { action } from '@ember/object';
-import { service } from '@ember/service';
-import { on } from '@ember/modifier';
-import UiButton from 'frontend/components/ui/button';
-import UiInput from 'frontend/components/ui/input';
-import UiCard from 'frontend/components/ui/card';
+import { tracked, action, service, on } from 'frontend/utils/stdlib';
+import { UiButton, UiInput, UiCard } from 'frontend/components/ui';
 
 export default class LoginPage extends Component {
   @service session;

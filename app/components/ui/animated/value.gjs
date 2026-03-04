@@ -1,7 +1,5 @@
 import Component from '@glimmer/component';
-import { tracked } from '@glimmer/tracking';
-import { action } from '@ember/object';
-import { args } from 'frontend/decorators/args';
+import { tracked, action, args } from 'frontend/utils/stdlib';
 import viewTransition from 'frontend/modifiers/view-transition';
 
 @args({

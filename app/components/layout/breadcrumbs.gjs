@@ -1,8 +1,5 @@
 import Component from '@glimmer/component';
-import { service } from '@ember/service';
-import { LinkTo } from '@ember/routing';
-import { gt } from 'ember-truth-helpers';
-import Await from '../await';
+import { service, LinkTo, gt, Await } from 'frontend/utils/stdlib';
 import viewTransitionName from 'frontend/modifiers/view-transition-name';
 
 export default class BreadcrumbsComponent extends Component {

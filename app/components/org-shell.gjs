@@ -1,9 +1,5 @@
 import Component from '@glimmer/component';
-import { tracked } from '@glimmer/tracking';
-import { action } from '@ember/object';
-import { service } from '@ember/service';
-import { on } from '@ember/modifier';
-import { LinkTo } from '@ember/routing';
+import { tracked, action, service, on, LinkTo } from 'frontend/utils/stdlib';
 import routerViewTransition from 'frontend/modifiers/router-view-transition';
 
 export default class OrgShell extends Component {

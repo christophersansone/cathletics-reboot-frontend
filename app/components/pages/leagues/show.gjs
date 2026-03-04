@@ -1,28 +1,10 @@
 import Component from '@glimmer/component';
-import { tracked, cached } from '@glimmer/tracking';
-import { action } from '@ember/object';
-import { service } from '@ember/service';
-import { on } from '@ember/modifier';
-import { fn, array } from '@ember/helper';
+import { tracked, cached, action, service, on, fn, array, LinkTo, eq, Await, Errors, LoadingIndicator, args, DeferredPromise } from 'frontend/utils/stdlib';
 import { task } from 'ember-concurrency';
-import { LinkTo } from '@ember/routing';
-import { or, eq } from 'ember-truth-helpers';
-import UiButton from '../../ui/button';
-import UiCard from '../../ui/card';
-import UiBadge from '../../ui/badge';
-import UiInput from '../../ui/input';
-import UiModal from '../../ui/modal';
-import UiSelect from '../../ui/select';
-import TypeableSelect from '../../ui/typeable-select';
-import Await from '../../await';
-import Errors from '../../errors';
+import { UiButton, UiCard, UiBadge, UiInput, UiModal, UiTypeableSelect } from 'frontend/components/ui';
 import InfiniteScroll from '../../infinite-scroll';
-import LoadingIndicator from '../../ui/loading-indicator';
 import formatDate from 'frontend/helpers/format-date';
-import args from 'frontend/decorators/args';
-import DeferredPromise from 'frontend/utils/deferred-promise';
-import Breadcrumbs from '../../layout/breadcrumbs';
-import DetailHeader from '../../layout/detail-header';
+import { Breadcrumbs, DetailHeader } from 'frontend/components/layout';
 import autoFocus from 'frontend/modifiers/auto-focus';
 import TeamList from 'frontend/components/team/list';
 
@@ -448,7 +430,7 @@ export default class LeagueShowPage extends Component {
         <form class="flex flex-col gap-4" {{on "submit" (fn this.preventAndSave this.registrationModal)}}>
           <div class="form-group">
             <label class="form-label">Participant</label>
-            <TypeableSelect
+            <UiTypeableSelect
               @options={{array}}
               @selected={{this.registrationModal.selectedUser}}
               @path="fullName"

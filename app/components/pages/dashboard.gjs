@@ -1,5 +1,5 @@
-import UiCard from 'frontend/components/ui/card';
-import PageHeader from 'frontend/components/layout/page-header';
+import { UiCard } from 'frontend/components/ui';
+import { PageHeader } from 'frontend/components/layout';
 
 <template>
   <PageHeader>

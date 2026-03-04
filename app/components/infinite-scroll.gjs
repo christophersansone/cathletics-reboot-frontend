@@ -1,12 +1,9 @@
 import Component from '@glimmer/component';
-import { cached } from '@glimmer/tracking';
-import { action } from '@ember/object';
+import { cached, action, eq, LoadingIndicator, args } from 'frontend/utils/stdlib';
 import { modifier } from 'ember-modifier';
-import { and, eq } from 'ember-truth-helpers';
-import LoadingIndicator from './ui/loading-indicator';
+import { and } from 'ember-truth-helpers';
 import { TrackedSet } from 'tracked-built-ins';
 import Paginator from 'frontend/utils/paginator';
-import args from 'frontend/decorators/args';
 
 const DEFAULT_THRESHOLD = '600px';
 

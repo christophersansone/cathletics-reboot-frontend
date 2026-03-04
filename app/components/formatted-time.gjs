@@ -1,6 +1,6 @@
 import Component from '@glimmer/component';
+import { args } from 'frontend/utils/stdlib';
 import { formatEventDateTime } from 'frontend/utils/datetime';
-import args from 'frontend/decorators/args';
 
 @args({
   value: { required: true },

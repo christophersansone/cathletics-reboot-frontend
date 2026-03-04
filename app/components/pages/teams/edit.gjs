@@ -1,16 +1,8 @@
 import Component from '@glimmer/component';
-import { cached } from '@glimmer/tracking';
-import { service } from '@ember/service';
-import { on } from '@ember/modifier';
-import { fn, array } from '@ember/helper';
+import { cached, service, on, Errors, args } from 'frontend/utils/stdlib';
 import { task } from 'ember-concurrency';
-import UiButton from '../../ui/button';
-import UiCard from '../../ui/card';
-import UiInput from '../../ui/input';
-import Errors from '../../errors';
-import args from 'frontend/decorators/args';
-import Breadcrumbs from '../../layout/breadcrumbs';
-import DetailHeader from '../../layout/detail-header';
+import { UiButton, UiCard, UiInput } from 'frontend/components/ui';
+import { Breadcrumbs, DetailHeader } from 'frontend/components/layout';
 import autoFocus from 'frontend/modifiers/auto-focus';
 
 @args({

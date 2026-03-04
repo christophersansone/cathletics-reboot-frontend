@@ -1,15 +1,9 @@
 import Component from '@glimmer/component';
-import args from 'frontend/decorators/args';
-import Await from 'frontend/components/await';
+import { on, fn, array, LinkTo, Await, LoadingIndicator, args } from 'frontend/utils/stdlib';
+import { UiCard, UiButton } from 'frontend/components/ui';
+import InfiniteScroll from 'frontend/components/infinite-scroll';
 import Organization from 'frontend/models/organization';
 import Paginator from 'frontend/utils/paginator';
-import UiCard from 'frontend/components/ui/card';
-import InfiniteScroll from 'frontend/components/infinite-scroll';
-import UiButton from 'frontend/components/ui/button';
-import LoadingIndicator from 'frontend/components/ui/loading-indicator';
-import { LinkTo } from '@ember/routing';
-import { on } from '@ember/modifier';
-import { fn, array } from '@ember/helper';
 
 @args({
   org: { type: Organization, required: true },

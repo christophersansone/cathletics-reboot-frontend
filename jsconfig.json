@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowJs": true,
+    "checkJs": true,
+    "experimentalDecorators": true,
+    "baseUrl": ".", // This refers to the 'frontend' folder itself
+    "paths": {
+      "frontend/tests/*": ["tests/*"],
+      "frontend/*": ["app/*"],
+      // Let the editor find these naturally from node_modules
+      "@ember/*": ["node_modules/@ember/*/index.d.ts", "node_modules/@ember/*"],
+      "@glimmer/*": ["node_modules/@glimmer/*/index.d.ts", "node_modules/@glimmer/*"]
+    }
+  },
+  "include": [
+    "app/**/*",
+    "tests/**/*",
+    "types/**/*"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "tmp"
+  ]
+}
