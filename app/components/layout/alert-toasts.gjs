@@ -1,7 +1,7 @@
 import Component from '@glimmer/component';
 import { service } from '@ember/service';
 import { fn } from '@ember/helper';
-import UiAlert from './ui/alert';
+import UiAlert from 'frontend/components/ui/alert';
 
 export default class AlertToasts extends Component {
   @service alerts;

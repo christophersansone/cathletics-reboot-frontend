@@ -3,7 +3,7 @@ import { tracked, cached } from '@glimmer/tracking';
 import { action } from '@ember/object';
 import { service } from '@ember/service';
 import { on } from '@ember/modifier';
-import { fn, array } from '@ember/helper';
+import { array } from '@ember/helper';
 import { task } from 'ember-concurrency';
 import { LinkTo } from '@ember/routing';
 import UiButton from '../../ui/button';
@@ -53,6 +53,7 @@ export default class ActivityTypeShowPage extends Component {
   @service pagination;
   @service router;
   @service alerts;
+  @service('modal') modalService;
 
   @tracked modal = null;
 
@@ -74,7 +75,8 @@ export default class ActivityTypeShowPage extends Component {
   });
 
   deleteActivityType = task(async () => {
-    if (!window.confirm(`Delete "${this.args.activityType.name}"? This will also remove all seasons and leagues.`)) return;
+    const confirmed = await this.modalService.confirm(`Delete "${this.args.activityType.name}"? This will also remove all seasons and leagues.`);
+    if (!confirmed) return;
     await this.atomic.destroyModel(this.args.activityType);
     this.alerts.success('Activity type deleted.');
     this.router.transitionTo('orgs.org.activity-types', this.args.org.slug);

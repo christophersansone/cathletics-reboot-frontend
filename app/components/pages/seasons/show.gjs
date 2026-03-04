@@ -28,6 +28,7 @@ export default class SeasonShowPage extends Component {
   @service pagination;
   @service router;
   @service alerts;
+  @service modal;
 
   @cached
   get paginator() {
@@ -35,7 +36,8 @@ export default class SeasonShowPage extends Component {
   }
 
   deleteSeason = task(async () => {
-    if (!window.confirm(`Delete "${this.args.season.name}"? This will also remove all leagues.`)) return;
+    const confirmed = await this.modal.confirm(`Delete "${this.args.season.name}"? This will also remove all leagues.`);
+    if (!confirmed) return;
     await this.atomic.destroyModel(this.args.season);
     this.alerts.success('Season deleted.');
     this.router.transitionTo(

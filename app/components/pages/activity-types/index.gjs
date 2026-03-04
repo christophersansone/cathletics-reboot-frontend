@@ -90,6 +90,7 @@ export default class ActivityTypesIndexPage extends Component {
   @service store;
   @service atomic;
   @service pagination;
+  @service('modal') modalService;
 
   @tracked modal = null;
 
@@ -121,7 +122,8 @@ export default class ActivityTypesIndexPage extends Component {
   });
 
   deleteActivityType = task(async (activityType) => {
-    if (!window.confirm(`Delete "${activityType.name}"? This cannot be undone.`)) return;
+    const confirmed = await this.modalService.confirm(`Delete "${activityType.name}"? This cannot be undone.`);
+    if (!confirmed) return;
     await this.atomic.destroyModel(activityType);
   });
 

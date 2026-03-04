@@ -3,7 +3,7 @@ import { cached } from '@glimmer/tracking';
 import Paginator from 'frontend/utils/paginator';
 import InfiniteScroll from 'frontend/components/infinite-scroll';
 
-export default class InfiniteScrollTest extends Component {
+export default class InfiniteScrollExampleComponent extends Component {
 
   @cached
   get paginator() {

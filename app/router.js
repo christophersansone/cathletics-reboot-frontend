@@ -28,6 +28,11 @@ Router.map(function () {
           this.route('edit');
         });
       });
+      this.route('teams', function () {
+        this.route('team', { path: ':team_id' }, function () {
+          this.route('edit');
+        });
+      });
       this.route('members');
       this.route('families');
       this.route('settings');
