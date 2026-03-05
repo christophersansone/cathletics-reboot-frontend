@@ -1,18 +1,38 @@
 import Component from '@glimmer/component';
-import { on, fn, array, LinkTo, Await, LoadingIndicator, args } from 'frontend/utils/stdlib';
+import { on, fn, array, LinkTo, Await, LoadingIndicator, args, service } from 'frontend/utils/stdlib';
 import { UiCard, UiButton } from 'frontend/components/ui';
 import InfiniteScroll from 'frontend/components/infinite-scroll';
 import Organization from 'frontend/models/organization';
 import Paginator from 'frontend/utils/paginator';
+import { task } from 'ember-concurrency';
+import TeamModalComponent, { EditTeamModal } from './modal';
 
 @args({
   org: { type: Organization, required: true },
   paginator: { type: Paginator, required: true },
-  onEdit: { type: 'function', required: true },
-  onDelete: { type: 'function', required: true },
-  onCreate: { type: 'function', required: true },
+  onCreate: { type: 'function' },
 })
 export default class TeamListComponent extends Component {
+  @service atomic;
+  @service alerts;
+  @service modal;
+
+  editTeam = task({ drop: true }, async (team) => {
+    const modalDialog = new EditTeamModal({ model: team, atomic: this.atomic });
+    const result = await this.modal.execute(modalDialog, TeamModalComponent);
+    if (result.result === 'saved') {
+      this.alerts.success('Team updated.');
+    }
+  });
+
+  deleteTeam = task(async (team) => {
+    const confirmed = await this.modal.confirm(`Delete team "${team.name}"?`);
+    if (!confirmed) return;
+    await this.atomic.destroyModel(team);
+    this.alerts.success('Team deleted.');
+    await this.args.paginator.reload();
+  });
+
   <template>
     <Await @promise={{@paginator.firstPage}} @showLatest={{true}}>
       <UiCard @padding={{false}}>
@@ -33,10 +53,10 @@ export default class TeamListComponent extends Component {
                     </LinkTo>
                   </td>
                   <td class="data-table__actions">
-                    <UiButton @variant="ghost" @size="sm" {{on "click" (fn @onEdit team)}}>
+                    <UiButton @variant="ghost" @size="sm" {{on "click" (fn this.editTeam.perform team)}}>
                       Edit
                     </UiButton>
-                    <UiButton @variant="ghost" @size="sm" class="text-danger" {{on "click" (fn @onDelete team)}}>
+                    <UiButton @variant="ghost" @size="sm" class="text-danger" {{on "click" (fn this.deleteTeam.perform team)}}>
                       Delete
                     </UiButton>
                   </td>
@@ -61,7 +81,9 @@ export default class TeamListComponent extends Component {
                     <div class="empty-state">
                       <p class="empty-state__message">No teams yet</p>
                       <p class="empty-state__hint">Create teams to organize players into groups within this league.</p>
-                      <UiButton class="mt-4" {{on "click" @onCreate}}>Create Team</UiButton>
+                      {{#if @onCreate}}
+                        <UiButton class="mt-4" {{on "click" @onCreate}}>Create Team</UiButton>
+                      {{/if}}
                     </div>
                   </td>
                 </tr>

@@ -1,55 +1,62 @@
 import Component from '@glimmer/component';
-import { service, on, fn, action } from 'frontend/utils/stdlib';
+import { service, on, fn, action, args } from 'frontend/utils/stdlib';
 import { UiModal, UiButton } from 'frontend/components/ui';
+
+@args({
+  modalDialog: { required: true },
+})
+export class AlertModalComponent extends Component {
+  <template>
+    <UiModal @title={{@modalDialog.title}} @onClose={{@modalDialog.resolve}}>
+      <:default>
+        {{@modalDialog.text}}
+      </:default>
+      <:footer>
+        <UiButton @variant="primary" {{on 'click' @modalDialog.resolve}}>
+          {{@modalDialog.okTitle}}
+        </UiButton>
+      </:footer>
+    </UiModal>
+  </template>
+}
+
+@args({
+  modalDialog: { required: true },
+})
+export class ConfirmModalComponent extends Component {
+  <template>
+    <UiModal @title={{@modalDialog.title}} @onClose={{fn @modalDialog.resolve false}}>
+      <:default>
+        {{@modalDialog.text}}
+      </:default>
+      <:footer>
+        <UiButton @variant="ghost" {{on 'click' (fn @modalDialog.resolve false)}}>
+          {{@modalDialog.noTitle}}
+        </UiButton>
+        <UiButton @variant="primary" {{on 'click' (fn @modalDialog.resolve true)}}>
+          {{@modalDialog.yesTitle}}
+        </UiButton>
+      </:footer>
+    </UiModal>
+  </template>
+}
 
 export default class ModalServiceDialogComponent extends Component {
   @service modal;
 
-  get dialog() {
-    return this.modal.current;
+  get modalDialog() {
+    return this.modal.current?.modalDialog;
   }
 
-  get isAlert() {
-    return this.dialog?.type === 'alert';
-  }
-
-  get isConfirm() {
-    return this.dialog?.type === 'confirm';
-  }
-
-  @action
-  resolve(value) {
-    this.dialog.resolve(value);
+  get componentClass() {
+    return this.modal.current?.componentClass;
   }
 
   <template>
-    {{#if this.isAlert}}
-      <UiModal @title={{this.dialog.title}} @onClose={{this.resolve}}>
-        <:default>
-          {{this.dialog.text}}
-        </:default>
-        <:footer>
-          <UiButton @variant="primary" {{on 'click' this.resolve}}>
-            {{this.dialog.okTitle}}
-          </UiButton>
-        </:footer>
-      </UiModal>
-    {{/if}}
-
-    {{#if this.isConfirm}}
-      <UiModal @title={{this.dialog.title}} @onClose={{fn this.resolve false}}>
-        <:default>
-          {{this.dialog.text}}
-        </:default>
-        <:footer>
-          <UiButton @variant="ghost" {{on 'click' (fn this.resolve false)}}>
-            {{this.dialog.noTitle}}
-          </UiButton>
-          <UiButton @variant="primary" {{on 'click' (fn this.resolve true)}}>
-            {{this.dialog.yesTitle}}
-          </UiButton>
-        </:footer>
-      </UiModal>
+    {{#if this.modalDialog}}
+      {{#let this.componentClass as |ComponentClass|}}
+        <ComponentClass @modalDialog={{this.modalDialog}} />
+      {{/let}}
     {{/if}}
   </template>
 }

@@ -1,41 +1,25 @@
 import Component from '@glimmer/component';
-import { tracked, cached, service, on, fn, eq, Await, LoadingIndicator, args } from 'frontend/utils/stdlib';
-import { task, timeout } from 'ember-concurrency';
-import { UiButton, UiCard, UiInput } from 'frontend/components/ui';
-import InfiniteScroll from '../infinite-scroll';
-import { PageHeader } from 'frontend/components/layout';
+import { on, fn, Await, LoadingIndicator, args, service, eq } from 'frontend/utils/stdlib';
+import { UiCard, UiButton } from 'frontend/components/ui';
+import InfiniteScroll from 'frontend/components/infinite-scroll';
+import Paginator from 'frontend/utils/paginator';
+import { task } from 'ember-concurrency';
 
-const ROLE_OPTIONS = ['admin', 'member'];
+const ROLE_OPTIONS = ['player', 'coach', 'assistant_coach', 'manager'];
 
 function roleLabel(role) {
+  if (role === 'assistant_coach') return 'Asst. Coach';
   return role ? role.charAt(0).toUpperCase() + role.slice(1) : '';
 }
 
 @args({
-  org: { required: true },
+  paginator: { type: Paginator, required: true },
+  onCreate: { type: 'function' },
 })
-export default class MembersPage extends Component {
+export default class TeamMembershipListComponent extends Component {
   @service atomic;
-  @service pagination;
-  @service modal;
   @service alerts;
-
-  @tracked searchQuery = '';
-  @tracked _paginatorKey = 0;
-
-  @cached
-  get paginator() {
-    this._paginatorKey;
-    const params = {};
-    if (this.searchQuery) params.q = this.searchQuery;
-    return this.pagination.query('organization-membership', params);
-  }
-
-  searchTask = task({ restartable: true }, async (event) => {
-    await timeout(300);
-    this.searchQuery = event.target.value;
-    this._paginatorKey++;
-  });
+  @service modal;
 
   updateRole = task(async (membership, event) => {
     const newRole = event.target.value;
@@ -47,50 +31,31 @@ export default class MembersPage extends Component {
   removeMember = task(async (membership) => {
     const user = await membership.user;
     const name = user?.fullName || 'this member';
-    const confirmed = await this.modal.confirm(`Remove ${name} from the organization?`);
+    const confirmed = await this.modal.confirm(`Remove ${name} from the team?`);
     if (!confirmed) return;
     await this.atomic.destroyModel(membership);
     this.alerts.success('Member removed.');
-    this._paginatorKey++;
+    await this.args.paginator.reload();
   });
 
   <template>
-    <PageHeader>
-      <:title>Members</:title>
-      <:description>Manage organization members and roles</:description>
-    </PageHeader>
-
-    <div class="mb-4">
-      <UiInput
-        @placeholder="Search by name..."
-        @id="member-search"
-        {{on "input" this.searchTask.perform}}
-      />
-    </div>
-
-    <Await @promise={{this.paginator.firstPage}} @showLatest={{true}}>
+    <Await @promise={{@paginator.firstPage}} @showLatest={{true}}>
       <UiCard @padding={{false}}>
         <table class="data-table">
           <thead>
             <tr>
               <th>Name</th>
-              <th class="hide-mobile">Email</th>
               <th>Role</th>
               <th class="data-table__actions-col"></th>
             </tr>
           </thead>
           <tbody>
-            <InfiniteScroll @paginator={{this.paginator}} @occlude={{true}} @scrollElement=".app-content">
+            <InfiniteScroll @paginator={{@paginator}} @occlude={{true}} @scrollElement=".app-content">
               <:item as |membership|>
                 <tr>
                   <td class="font-medium">
                     <Await @promise={{membership.user}} as |user|>
                       {{user.fullName}}
-                    </Await>
-                  </td>
-                  <td class="text-secondary hide-mobile">
-                    <Await @promise={{membership.user}} as |user|>
-                      {{user.email}}
                     </Await>
                   </td>
                   <td>
@@ -116,22 +81,25 @@ export default class MembersPage extends Component {
 
               <:sentinel as |sentinelModifier|>
                 <tr {{sentinelModifier}}>
-                  <td colspan="4" class="infinite-scroll-page-sentinel"></td>
+                  <td colspan="3" class="infinite-scroll-page-sentinel"></td>
                 </tr>
               </:sentinel>
 
               <:loading as |loadingModifier|>
                 <tr {{loadingModifier}}>
-                  <td colspan="4"><LoadingIndicator /></td>
+                  <td colspan="3"><LoadingIndicator /></td>
                 </tr>
               </:loading>
 
               <:empty>
                 <tr>
-                  <td colspan="4">
+                  <td colspan="3">
                     <div class="empty-state">
-                      <p class="empty-state__message">No members found</p>
-                      <p class="empty-state__hint">Members join by creating an account and being added to your organization.</p>
+                      <p class="empty-state__message">No members yet</p>
+                      <p class="empty-state__hint">Add players, coaches, and staff to this team's roster.</p>
+                      {{#if @onCreate}}
+                        <UiButton class="mt-4" {{on "click" @onCreate}}>Add Member</UiButton>
+                      {{/if}}
                     </div>
                   </td>
                 </tr>

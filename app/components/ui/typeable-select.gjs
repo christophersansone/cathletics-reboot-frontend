@@ -68,7 +68,7 @@ export default class SearchableSelect extends Component {
   }
 
   <template>
-    <div class="combobox-container" {{clickOutside this.close}} ...attributes>
+    <div class="combobox-container" {{clickOutside this.close}}>
       <input
         type="text"
         value={{or this.displayValue this.query}}
@@ -77,6 +77,7 @@ export default class SearchableSelect extends Component {
         class="combobox-input"
         {{on "input" this.updateQuery}}
         {{on "focus" this.open}}
+         ...attributes
       />
 
       {{#if this.isOpen}}

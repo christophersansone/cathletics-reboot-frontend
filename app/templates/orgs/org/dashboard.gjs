@@ -3,5 +3,5 @@ import DashboardPage from 'frontend/components/pages/dashboard';
 
 <template>
   {{pageTitle "Dashboard"}}
-  <DashboardPage />
+  <DashboardPage @stats={{@model.stats}} @org={{@model.org}} />
 </template>

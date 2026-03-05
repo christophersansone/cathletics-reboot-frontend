@@ -3,5 +3,5 @@ import FamiliesPage from 'frontend/components/pages/families';
 
 <template>
   {{pageTitle "Families"}}
-  <FamiliesPage />
+  <FamiliesPage @org={{@model.org}} />
 </template>

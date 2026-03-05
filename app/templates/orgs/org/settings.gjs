@@ -3,5 +3,5 @@ import SettingsPage from 'frontend/components/pages/settings';
 
 <template>
   {{pageTitle "Settings"}}
-  <SettingsPage />
+  <SettingsPage @org={{@model.org}} />
 </template>

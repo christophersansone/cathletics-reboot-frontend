@@ -3,5 +3,5 @@ import MembersPage from 'frontend/components/pages/members';
 
 <template>
   {{pageTitle "Members"}}
-  <MembersPage />
+  <MembersPage @org={{@model.org}} />
 </template>

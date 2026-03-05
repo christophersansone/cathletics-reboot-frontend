@@ -1,24 +1,25 @@
 import Service from '@ember/service';
 import DeferredPromise from 'frontend/utils/deferred-promise';
 import { tracked } from '@glimmer/tracking';
+import { AlertModalComponent, ConfirmModalComponent } from 'frontend/components/layout/modal-service-dialog';
 
-class ModalDialog {
+export class ModalDialog {
   promise = null;
 
   constructor() {
     this.promise = new DeferredPromise();
   }
 
-  resolve(value) {
+  resolve = (value) => {
     this.promise.resolve(value);
   }
 
-  reject(error) {
+  reject = (error) => {
     this.promise.reject(error);
   }
 }
 
-class AlertModal extends ModalDialog {
+export class AlertModal extends ModalDialog {
   type = 'alert';
   text = null;
   title = null;
@@ -32,7 +33,7 @@ class AlertModal extends ModalDialog {
   }
 }
 
-class ConfirmModal extends ModalDialog {
+export class ConfirmModal extends ModalDialog {
   type = 'confirm';
   text = null;
   title = null;
@@ -52,15 +53,20 @@ export default class ModalService extends Service {
   @tracked current = null;
 
   async alert(text, { title } = {}) {
-    this.current = new AlertModal({ title, text });
-    const result = await this.current.promise;
-    this.current = null;
-    return result;
+    const modalDialog = new AlertModal({ title, text });
+    const componentClass = AlertModalComponent;
+    return await this.execute(modalDialog, componentClass);
   }
 
-  async confirm(text, { title, yesTitle, noTitle} = {}) {
-    this.current = new ConfirmModal({ title, text, yesTitle, noTitle });
-    const result = await this.current.promise;
+  async confirm(text, { title, yesTitle, noTitle } = {}) {
+    const modalDialog = new ConfirmModal({ title, text, yesTitle, noTitle });
+    const componentClass = ConfirmModalComponent;
+    return await this.execute(modalDialog, componentClass);
+  }
+
+  async execute(modalDialog, componentClass) {
+    this.current = { modalDialog, componentClass };
+    const result = await this.current.modalDialog.promise;
     this.current = null;
     return result;
   }
