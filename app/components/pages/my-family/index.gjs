@@ -29,16 +29,7 @@ export default class MyFamilyIndexPage extends Component {
   });
 
   <template>
-    <div class="centered-layout my-family-layout">
-      <div class="my-family-container">
-        <div class="my-family-header">
-          <h1 class="login-title">Cathletics</h1>
-          <nav class="my-family-nav">
-            <LinkTo @route="orgs" class="text-link text-sm">My Organizations</LinkTo>
-            <button type="button" class="text-link text-sm" {{on "click" this.session.invalidate}}>Sign Out</button>
-          </nav>
-        </div>
-
+    <div class="member-page">
         {{#if @families.length}}
           <UiCard @title="My Families">
             <ul class="family-list">
@@ -95,7 +86,6 @@ export default class MyFamilyIndexPage extends Component {
             </div>
           </UiCard>
         {{/if}}
-      </div>
     </div>
   </template>
 }

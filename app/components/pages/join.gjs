@@ -17,13 +17,11 @@ export default class JoinPage extends Component {
   joinTask = task({ drop: true }, async () => {
     this.error = null;
     try {
-      const adapter = this.store.adapterFor('application');
-      const url = `${adapter.host}/${adapter.namespace}/organizations/${this.args.org.slug}/join`;
-      const response = await adapter.ajax(url, 'POST');
-      this.store.pushPayload(response);
-      this.session.setOrganization(this.args.org);
-      this.alerts.success(`Welcome to ${this.args.org.name}!`);
-      this.router.transitionTo('orgs.org.dashboard', this.args.org.slug);
+      const organization = this.args.org;
+      await this.store.adapterFor('organization').join(organization);
+      this.session.setOrganization(organization);
+      this.alerts.success(`Welcome to ${organization.name}!`);
+      this.router.transitionTo('orgs.org.dashboard', organization.slug);
     } catch (e) {
       this.error = e.message || 'Something went wrong. Please try again.';
     }

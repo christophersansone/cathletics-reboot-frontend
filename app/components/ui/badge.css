@@ -8,32 +8,32 @@
   white-space: nowrap;
 }
 
-.badge--default {
+.badge[data-variant="default"] {
   background: var(--color-gray-100);
   color: var(--color-gray-700);
 }
 
-.badge--primary {
+.badge[data-variant="primary"] {
   background: var(--color-primary-subtle);
   color: var(--color-primary);
 }
 
-.badge--success {
+.badge[data-variant="success"] {
   background: var(--color-success-subtle);
   color: var(--color-success);
 }
 
-.badge--warning {
+.badge[data-variant="warning"] {
   background: var(--color-warning-subtle);
   color: var(--color-warning);
 }
 
-.badge--danger {
+.badge[data-variant="danger"] {
   background: var(--color-danger-subtle);
   color: var(--color-danger);
 }
 
-.badge--info {
+.badge[data-variant="info"] {
   background: var(--color-info-subtle);
   color: var(--color-info);
 }

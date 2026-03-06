@@ -35,7 +35,7 @@ export default class LoginPage extends Component {
         this.session.attemptedTransition = null;
         attempted.retry();
       } else {
-        this.router.transitionTo('orgs');
+        this.router.transitionTo('home');
       }
     } catch (e) {
       this.error = e.message;

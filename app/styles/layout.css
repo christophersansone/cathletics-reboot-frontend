@@ -144,6 +144,22 @@
     font-weight: 600;
   }
 
+  /* Member page content wrapper (used inside MemberShell) */
+  .member-page {
+    width: 100%;
+    max-width: 48rem;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+  }
+
+  .member-page__title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin-bottom: var(--space-4);
+  }
+
   /* Form page wrapper */
   .form-page {
     max-width: 640px;

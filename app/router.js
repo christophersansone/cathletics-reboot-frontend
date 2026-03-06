@@ -11,6 +11,17 @@ Router.map(function () {
   this.route('signup');
   this.route('join', { path: '/join/:org_slug' });
   this.route('join-family', { path: '/join-family/:token' });
+  this.route('home');
+  this.route('register');
+  this.route('schedule');
+  this.route('account');
+  this.route('teams', function () {
+    this.route('team', { path: '/:team_id' }, function () {
+      this.route('roster');
+      this.route('schedule');
+      this.route('chat');
+    });
+  });
   this.route('my-family', function () {
     this.route('family', { path: '/:family_id' });
   });

@@ -1,5 +1,5 @@
 import Component from '@glimmer/component';
-import { tracked, cached, action, service, on, fn, eq, Errors, Await, LinkTo } from 'frontend/utils/stdlib';
+import { tracked, cached, action, service, on, fn, eq, Errors, Await } from 'frontend/utils/stdlib';
 import { task, timeout } from 'ember-concurrency';
 import { UiButton, UiCard, UiInput, UiSelect, UiGradeLevelSelect, UiModal } from 'frontend/components/ui';
 import { ModalDialog } from 'frontend/services/modal';
@@ -304,17 +304,7 @@ export default class MyFamilyShowPage extends Component {
   });
 
   <template>
-    <div class="centered-layout my-family-layout">
-      <div class="my-family-container">
-        <div class="my-family-header">
-          <h1 class="login-title">Cathletics</h1>
-          <nav class="my-family-nav">
-            <LinkTo @route="my-family" class="text-link text-sm">My Families</LinkTo>
-            <LinkTo @route="orgs" class="text-link text-sm">My Organizations</LinkTo>
-            <button type="button" class="text-link text-sm" {{on "click" this.session.invalidate}}>Sign Out</button>
-          </nav>
-        </div>
-
+    <div class="member-page">
         <UiCard @title={{this.family.name}}>
           <Errors @error={{this.renameFamilyTask.last.error}} />
           <Errors @error={{this.removeChild.last.error}} />
@@ -360,7 +350,6 @@ export default class MyFamilyShowPage extends Component {
             </:default>
           </UiCard>
         {{/if}}
-      </div>
     </div>
   </template>
 }
