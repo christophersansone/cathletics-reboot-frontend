@@ -1,6 +1,7 @@
 import Component from '@glimmer/component';
-import { tracked, action, service, on } from 'frontend/utils/stdlib';
+import { tracked, action, service, on, LinkTo } from 'frontend/utils/stdlib';
 import { UiButton, UiInput, UiCard } from 'frontend/components/ui';
+import viewTransitionName from 'frontend/modifiers/view-transition-name';
 
 export default class LoginPage extends Component {
   @service session;
@@ -29,7 +30,13 @@ export default class LoginPage extends Component {
 
     try {
       await this.session.authenticate(this.email, this.password);
-      this.router.transitionTo('orgs');
+      let attempted = this.session.attemptedTransition;
+      if (attempted) {
+        this.session.attemptedTransition = null;
+        attempted.retry();
+      } else {
+        this.router.transitionTo('orgs');
+      }
     } catch (e) {
       this.error = e.message;
     } finally {
@@ -38,11 +45,11 @@ export default class LoginPage extends Component {
   }
 
   <template>
-    <div class="centered-layout">
+    <div class="centered-layout" ...attributes>
       <div class="login-container">
-        <div class="login-logo">
+        <div class="login-logo" {{viewTransitionName 'header'}}>
           <h1 class="login-title">Cathletics</h1>
-          <p class="text-secondary">Sign in to manage your activities</p>
+          <p class="text-secondary" {{viewTransitionName 'reel'}}>Sign in to manage your activities</p>
         </div>
 
         <UiCard>
@@ -58,6 +65,7 @@ export default class LoginPage extends Component {
               @placeholder="you@example.com"
               @autocomplete="email"
               @id="email"
+              @viewTransitionName="email"
               {{on "input" this.updateEmail}}
             />
 
@@ -68,14 +76,20 @@ export default class LoginPage extends Component {
               @placeholder="Enter your password"
               @autocomplete="current-password"
               @id="password"
+              @viewTransitionName="password"
               {{on "input" this.updatePassword}}
             />
 
-            <UiButton @type="submit" @block={{true}} @loading={{this.isLoading}} disabled={{this.isLoading}}>
+            <UiButton @type="submit" @full={{true}} @loading={{this.isLoading}} disabled={{this.isLoading}} {{viewTransitionName 'submit'}}>
               Sign In
             </UiButton>
           </form>
         </UiCard>
+
+        <p class="auth-footer" {{viewTransitionName 'switch'}}>
+          Don't have an account?
+          <LinkTo @route="signup" class="text-link">Create one</LinkTo>
+        </p>
       </div>
     </div>
   </template>

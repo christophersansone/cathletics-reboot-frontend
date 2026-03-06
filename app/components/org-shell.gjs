@@ -1,6 +1,6 @@
 import Component from '@glimmer/component';
 import { tracked, action, service, on, LinkTo } from 'frontend/utils/stdlib';
-import routerViewTransition from 'frontend/modifiers/router-view-transition';
+import viewTransitionName from 'frontend/modifiers/view-transition-name';
 
 export default class OrgShell extends Component {
   @service session;
@@ -35,7 +35,7 @@ export default class OrgShell extends Component {
         <div class="sidebar-overlay hide-desktop" role="presentation" {{on "click" this.closeSidebar}}></div>
       {{/if}}
 
-      <aside class="app-sidebar {{if this.sidebarOpen 'is-open'}}">
+      <aside class="app-sidebar {{if this.sidebarOpen 'is-open'}}" {{viewTransitionName 'sidebar'}}>
         <div class="app-sidebar__header">
           <div class="app-sidebar__brand">{{@org.name}}</div>
         </div>
@@ -59,6 +59,9 @@ export default class OrgShell extends Component {
         </nav>
 
         <div class="app-sidebar__footer">
+          <LinkTo @route="my-family" class="app-sidebar__link">
+            My Family
+          </LinkTo>
           <button type="button" class="app-sidebar__link" {{on "click" this.toggleTheme}}>
             {{if this.theme.isDark "Light Mode" "Dark Mode"}}
           </button>
@@ -72,7 +75,7 @@ export default class OrgShell extends Component {
       </aside>
 
       <div class="app-main">
-        <header class="app-topbar">
+        <header class="app-topbar" {{viewTransitionName 'topbar'}}>
           <button type="button" class="topbar-menu-btn hide-desktop" {{on "click" this.toggleSidebar}}>
             <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <line x1="3" y1="6" x2="21" y2="6" />
@@ -85,7 +88,7 @@ export default class OrgShell extends Component {
           </div>
         </header>
 
-        <div id="router-view-transition-container" {{routerViewTransition}}>
+        <div id="page-container">
           <main class="app-content">
             {{yield}}
           </main>

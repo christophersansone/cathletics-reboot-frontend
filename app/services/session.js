@@ -13,6 +13,7 @@ export default class SessionService extends Service {
   @tracked currentUser = null;
   @tracked currentOrgId = null;
   @tracked isAuthenticated = false;
+  @tracked attemptedTransition = null;
 
   constructor() {
     super(...arguments);
@@ -28,6 +29,27 @@ export default class SessionService extends Service {
       this.isAuthenticated = true;
     }
     this.currentOrgId = localStorage.getItem('cathletics:orgId');
+  }
+
+  async signup({ firstName, lastName, email, password }) {
+    let response = await fetch(`${config.APP.apiHost}/${config.APP.apiNamespace}/signup`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/vnd.api+json' },
+      body: JSON.stringify({
+        data: {
+          type: 'users',
+          attributes: { firstName, lastName, email, password },
+        },
+      }),
+    });
+
+    if (!response.ok) {
+      let body = await response.json().catch(() => ({}));
+      let messages = body.errors?.map((e) => e.detail || e.title).join(', ');
+      throw new Error(messages || 'Signup failed');
+    }
+
+    await this.authenticate(email, password);
   }
 
   async authenticate(email, password) {

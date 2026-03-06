@@ -1,4 +1,5 @@
 import Component from '@glimmer/component';
+import { args } from 'frontend/utils/stdlib';
 
 const VARIANTS = {
   primary: 'btn-primary',
@@ -13,10 +14,18 @@ const SIZES = {
   lg: 'btn-lg',
 };
 
+@args({
+  variant: { type: 'string' },
+  size: { type: 'string' },
+  full: { type: 'boolean' },
+  type: { type: 'string' },
+  href: { type: 'string' },
+  loading: { type: 'boolean' },
+})
 export default class UiButton extends Component {
   get classes() {
     let cls = `btn ${VARIANTS[this.args.variant ?? 'primary']} ${SIZES[this.args.size ?? 'md']}`;
-    if (this.args.block) cls += ' btn-block';
+    if (this.args.full) cls += ' btn-block';
     return cls;
   }
 

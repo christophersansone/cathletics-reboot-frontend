@@ -17,6 +17,10 @@ module.exports = function (environment) {
       apiHost: 'http://localhost:3000',
       apiNamespace: 'api/v1',
       oauthClientId: process.env.OAUTH_CLIENT_ID || '',
+      routeTransitions: [
+        { from: 'login', to: 'signup', transition: 'none' },
+        { from: 'signup', to: 'login', transition: 'none' },
+      ]
     },
   };
 

@@ -3,9 +3,13 @@ import { modifier} from 'ember-modifier';
 export default modifier(function viewTransitionName(element, [transitionName]) {
   if (!document.startViewTransition) return;
 
-  element.style.viewTransitionName = transitionName;
+  if (transitionName) {
+    element.style.viewTransitionName = transitionName;
+  } else {
+    element.style.removeProperty('view-transition-name');
+  }
 
   return () => {
-    element.style.viewTransitionName = 'none';
+    element.style.removeProperty('view-transition-name');
   };
 });

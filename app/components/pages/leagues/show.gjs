@@ -12,16 +12,7 @@ import Organization from 'frontend/models/organization';
 import League from 'frontend/models/league';
 import Season from 'frontend/models/season';
 import ActivityType from 'frontend/models/activity-type';
-
-function gradeLabel(grade) {
-  const g = Number(grade);
-  if (g === -1) return 'Pre-K';
-  if (g === 0) return 'K';
-  const suffixes = ['th', 'st', 'nd', 'rd'];
-  const mod = g % 100;
-  return g + (suffixes[(mod - 20) % 10] || suffixes[mod] || suffixes[0]);
-}
-
+import { gradeLabel } from 'frontend/components/ui/grade-level-select';
 
 @args({
   league: { type: League, required: true },

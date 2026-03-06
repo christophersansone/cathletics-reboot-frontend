@@ -1,27 +1,19 @@
 import Component from '@glimmer/component';
-import { tracked, cached, service, on, fn, eq, Await, LoadingIndicator, args } from 'frontend/utils/stdlib';
+import { tracked, cached, service, on, gt, Await, LoadingIndicator, args } from 'frontend/utils/stdlib';
 import { task, timeout } from 'ember-concurrency';
+import { concat } from '@ember/helper';
 import { UiCard, UiInput } from 'frontend/components/ui';
 import InfiniteScroll from '../infinite-scroll';
 import { PageHeader } from 'frontend/components/layout';
 
-function parentNames(family) {
-  const memberships = family.familyMemberships?.slice?.() || [];
-  return memberships
-    .filter((m) => m.role === 'parent' || m.role === 'guardian')
-    .map((m) => m.user?.content?.fullName ?? m.user?.fullName ?? '')
-    .filter(Boolean)
-    .join(', ');
-}
-
-function childCount(family) {
-  const memberships = family.familyMemberships?.slice?.() || [];
+function childCount(memberships) {
   return memberships.filter((m) => m.role === 'child').length;
 }
 
-function memberCount(family) {
-  return family.familyMemberships?.length ?? 0;
+function parentsOf(memberships) {
+  return memberships.filter((m) => m.role === 'parent' || m.role === 'guardian');
 }
+
 
 @args({
   org: { required: true },
@@ -30,11 +22,9 @@ export default class FamiliesPage extends Component {
   @service pagination;
 
   @tracked searchQuery = '';
-  @tracked _paginatorKey = 0;
 
   @cached
   get paginator() {
-    this._paginatorKey;
     const params = {};
     if (this.searchQuery) params.q = this.searchQuery;
     return this.pagination.query('family', params);
@@ -43,7 +33,6 @@ export default class FamiliesPage extends Component {
   searchTask = task({ restartable: true }, async (event) => {
     await timeout(300);
     this.searchQuery = event.target.value;
-    this._paginatorKey++;
   });
 
   <template>
@@ -76,9 +65,25 @@ export default class FamiliesPage extends Component {
               <:item as |family|>
                 <tr>
                   <td class="font-medium">{{family.name}}</td>
-                  <td class="text-secondary hide-mobile">{{parentNames family}}</td>
-                  <td>{{childCount family}}</td>
-                  <td class="hide-mobile">{{memberCount family}}</td>
+                  <td class="text-secondary hide-mobile">
+                    <Await @promise={{family.familyMemberships}} as |memberships|>
+                      {{#each (parentsOf memberships) as |member index|}}
+                        <Await @promise={{member.user}} as |user|>
+                          {{concat (if (gt index 0) ', ') user.fullName}}
+                        </Await>
+                      {{/each}}
+                    </Await>
+                  </td>
+                  <td>
+                    <Await @promise={{family.familyMemberships}} as |memberships|>
+                      {{childCount memberships}}
+                    </Await>
+                  </td>
+                  <td class="hide-mobile">
+                    <Await @promise={{family.familyMemberships}} as |memberships|>
+                      {{memberships.length}}
+                    </Await>
+                  </td>
                 </tr>
               </:item>
 

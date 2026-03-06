@@ -1,4 +1,5 @@
 import Component from '@glimmer/component';
+import viewTransitionName from 'frontend/modifiers/view-transition-name';
 
 export default class UiInput extends Component {
   get inputClasses() {
@@ -8,7 +9,7 @@ export default class UiInput extends Component {
   }
 
   <template>
-    <div class="form-group">
+    <div class="form-group" {{viewTransitionName @viewTransitionName}}>
       {{#if @label}}
         <label class="form-label" for={{@id}}>{{@label}}</label>
       {{/if}}

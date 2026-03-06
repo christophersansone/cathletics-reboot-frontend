@@ -250,7 +250,7 @@ export default class InfiniteScroll extends Component {
     {{#if @paginator.hasMore}}
       {{#if (has-block "loading")}}
         {{! use the sentinel block when you need an entirely different tag such as <tr> or <li>}}
-        {{yield (this.loadingModifier) to="loading"}}
+        {{yield this.loadingModifier to="loading"}}
       {{else}}
         <div class="loading" {{this.loadingModifier}}>
           <LoadingIndicator />

@@ -7,14 +7,14 @@ const DEFAULT_PAGE_SIZE = 100;
 export default class PaginationService extends Service {
   @service store;
 
-  query(type, queryParams, { pageSize = DEFAULT_PAGE_SIZE } = {}) {
+  query(type, queryParams, { pageSize = DEFAULT_PAGE_SIZE, onResponse } = {}) {
     let paginator = null;
     let nextUrl = null;
 
     const fetchPage = async (queryParams) => {
       const response = await this.store.query(type, queryParams);
       nextUrl = response.links?.next;
-      return response;
+      return onResponse ? onResponse(response) : response;
     }
 
     const fetchFirstPage = async () => {
@@ -42,7 +42,7 @@ export default class PaginationService extends Service {
     return paginator;
   }
 
-  async fetchHasMany(record, relationshipName, { pageSize = DEFAULT_PAGE_SIZE }) {
+  hasMany(record, relationshipName, { pageSize = DEFAULT_PAGE_SIZE, onResponse } = {}) {
     const rel = record.hasMany(relationshipName);
     let url = rel.link();
     if (!url) {
@@ -50,6 +50,6 @@ export default class PaginationService extends Service {
     }
 
     const { searchParams } = new URL(url);
-    return await this.query(rel.type, Object.fromEntries(searchParams), { pageSize });
+    return this.query(rel.type, Object.fromEntries(searchParams), { pageSize, onResponse });
   }
 }

@@ -22,3 +22,10 @@
   border-radius: var(--radius-md);
   font-size: 0.875rem;
 }
+
+.auth-footer {
+  text-align: center;
+  margin-top: var(--space-4);
+  font-size: 0.875rem;
+  color: var(--color-text-secondary);
+}

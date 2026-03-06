@@ -1,0 +1,229 @@
+import Component from '@glimmer/component';
+import { tracked, cached, action, service, on, fn, eq, Errors, LinkTo } from 'frontend/utils/stdlib';
+import { task } from 'ember-concurrency';
+import { UiButton, UiCard, UiInput, UiSelect, UiGradeLevelSelect, UiModal } from 'frontend/components/ui';
+import { ModalDialog } from 'frontend/services/modal';
+import FamilyMemberList from 'frontend/components/family/member-list';
+import autoFocus from 'frontend/modifiers/auto-focus';
+import preventDefault from 'frontend/helpers/prevent-default';
+
+class ChildModal extends ModalDialog {
+  store = null;
+  atomic = null;
+  @tracked firstName = '';
+  @tracked lastName = '';
+  @tracked dateOfBirth = '';
+  @tracked gradeLevel = '';
+  @tracked gender = '';
+
+  title = 'Add Child';
+
+  constructor(attrs = {}) {
+    super();
+    this.store = attrs.store;
+    this.atomic = attrs.atomic;
+    if (attrs.firstName) this.firstName = attrs.firstName;
+    if (attrs.lastName) this.lastName = attrs.lastName;
+    if (attrs.dateOfBirth) this.dateOfBirth = attrs.dateOfBirth;
+    if (attrs.gradeLevel != null) this.gradeLevel = String(attrs.gradeLevel);
+    if (attrs.gender) this.gender = attrs.gender;
+  }
+
+  get childAttrs() {
+    return {
+      firstName: this.firstName,
+      lastName: this.lastName,
+      dateOfBirth: this.dateOfBirth || null,
+      gradeLevel: this.gradeLevel ? Number(this.gradeLevel) : null,
+      gender: this.gender || null,
+    };
+  }
+
+  saveTask = task({ drop: true }, async () => {
+    throw new Error('Not implemented');
+  });
+
+  get isSaving() { return this.saveTask.isRunning; }
+
+  @action save() { this.saveTask.perform(); }
+  @action cancel() { this.promise.resolve({ result: 'canceled' }); }
+  @action updateField(field, event) { this[field] = event.target.value; }
+}
+
+class AddChildModal extends ChildModal {
+  title = 'Add Child';
+  family = null;
+
+  constructor(attrs) {
+    super(attrs);
+    this.family = attrs.family;
+  }
+
+  saveTask = task({ drop: true }, async () => {
+    const adapter = this.store.adapterFor('family');
+    const child = await adapter.createChild(this.family, this.childAttrs);
+    this.promise.resolve({ result: 'saved', model: child });
+  });
+}
+
+class EditChildModal extends ChildModal {
+  title = 'Edit Child';
+  child = null;
+
+  constructor(attrs) {
+    super(attrs);
+    this.child = attrs.child;
+  }
+
+  saveTask = task({ drop: true }, async () => {
+    await this.atomic.updateModel(this.child, this.childAttrs);
+    this.promise.resolve({ result: 'saved', model: this.child });
+  });
+}
+
+const ChildModalComponent = <template>
+  <UiModal @title={{@modalDialog.title}} @onClose={{@modalDialog.cancel}}>
+    <Errors @error={{@modalDialog.saveTask.last.error}} />
+    <form class="flex flex-col gap-4" {{on "submit" (preventDefault @modalDialog.save)}}>
+      <div class="form-row">
+        <UiInput
+          @label="First Name"
+          @value={{@modalDialog.firstName}}
+          @placeholder="First name"
+          @id="child-first-name"
+          {{on "input" (fn @modalDialog.updateField "firstName")}}
+          {{autoFocus}}
+        />
+        <UiInput
+          @label="Last Name"
+          @value={{@modalDialog.lastName}}
+          @placeholder="Last name"
+          @id="child-last-name"
+          {{on "input" (fn @modalDialog.updateField "lastName")}}
+        />
+      </div>
+
+      <UiInput
+        @label="Date of Birth"
+        @type="date"
+        @value={{@modalDialog.dateOfBirth}}
+        @id="child-dob"
+        {{on "input" (fn @modalDialog.updateField "dateOfBirth")}}
+      />
+
+      <UiGradeLevelSelect
+        @label="Grade Level"
+        @id="child-grade"
+        @value={{@modalDialog.gradeLevel}}
+        {{on "change" (fn @modalDialog.updateField "gradeLevel")}}
+      />
+
+      <UiSelect
+        @label="Gender"
+        @id="child-gender"
+        @placeholder="Select gender..."
+        {{on "change" (fn @modalDialog.updateField "gender")}}
+      >
+        <option value="male" selected={{if (eq @modalDialog.gender "male") true}}>Male</option>
+        <option value="female" selected={{if (eq @modalDialog.gender "female") true}}>Female</option>
+      </UiSelect>
+
+      <div class="flex gap-3 justify-end">
+        <UiButton @variant="secondary" {{on "click" @modalDialog.cancel}}>Cancel</UiButton>
+        <UiButton @type="submit" @loading={{@modalDialog.isSaving}} disabled={{@modalDialog.isSaving}}>
+          Save
+        </UiButton>
+      </div>
+    </form>
+  </UiModal>
+</template>;
+
+export default class MyFamilyShowPage extends Component {
+  @service store;
+  @service session;
+  @service atomic;
+  @service alerts;
+  @service modal;
+  @service pagination;
+
+  get family() {
+    return this.args.family;
+  }
+
+  @cached
+  get membershipsPaginator() {
+    return this.pagination.hasMany(this.family, 'familyMemberships');
+  }
+
+  renameFamilyTask = task({ drop: true }, async () => {
+    const newName = await this.modal.prompt?.('Rename family') || null;
+    if (!newName) return;
+    await this.atomic.updateModel(this.family, { name: newName });
+    this.alerts.success('Family renamed.');
+  });
+
+  addChild = task({ drop: true }, async () => {
+    const dialog = new AddChildModal({
+      store: this.store,
+      family: this.family,
+      lastName: this.session.currentUser.lastName,
+    });
+    const result = await this.modal.execute(dialog, ChildModalComponent);
+    if (result.result === 'saved') {
+      this.alerts.success('Child added!');
+      await this.membershipsPaginator.reload();
+    }
+  });
+
+  editChild = task({ drop: true }, async (membership) => {
+    const child = await membership.user;
+    const dialog = new EditChildModal({
+      store: this.store,
+      atomic: this.atomic,
+      child,
+      firstName: child.firstName,
+      lastName: child.lastName,
+      dateOfBirth: child.dateOfBirth,
+      gradeLevel: child.gradeLevel,
+      gender: child.gender,
+    });
+    const result = await this.modal.execute(dialog, ChildModalComponent);
+    if (result.result === 'saved') {
+      this.alerts.success('Child updated.');
+    }
+  });
+
+  removeChild = task(async (membership) => {
+    const child = await membership.user;
+    const name = child?.fullName || 'this child';
+    const confirmed = await this.modal.confirm(`Remove ${name} from your family?`);
+    if (!confirmed) return;
+    await this.atomic.destroyModel(membership);
+    this.alerts.success('Child removed.');
+    await this.membershipsPaginator.reload();
+  });
+
+  <template>
+    <div class="centered-layout my-family-layout">
+      <div class="my-family-container">
+        <div class="my-family-header">
+          <h1 class="login-title">Cathletics</h1>
+          <nav class="my-family-nav">
+            <LinkTo @route="my-family" class="text-link text-sm">My Families</LinkTo>
+            <LinkTo @route="orgs" class="text-link text-sm">My Organizations</LinkTo>
+            <button type="button" class="text-link text-sm" {{on "click" this.session.invalidate}}>Sign Out</button>
+          </nav>
+        </div>
+
+        <UiCard @title={{this.family.name}}>
+          <FamilyMemberList
+            @paginator={{this.membershipsPaginator}}
+            @onAddChild={{this.addChild.perform}}
+            @onEditChild={{this.editChild.perform}}
+            @onRemoveChild={{this.removeChild.perform}}
+          />
+        </UiCard>
+      </div>
+    </div>
+  </template>
+}

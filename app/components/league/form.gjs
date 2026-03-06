@@ -1,6 +1,6 @@
 import Component from '@glimmer/component';
 import { action, on, fn, eq } from 'frontend/utils/stdlib';
-import { UiInput, UiButton } from 'frontend/components/ui';
+import { UiInput, UiButton, UiGradeLevelSelect } from 'frontend/components/ui';
 import autoFocus from 'frontend/modifiers/auto-focus';
 
 export default class LeagueForm extends Component {
@@ -41,22 +41,19 @@ export default class LeagueForm extends Component {
       </div>
 
       <div class="form-row">
-        <UiInput
+        <UiGradeLevelSelect
           @label="Min Grade"
           @value={{@league.minGrade}}
-          @type="number"
-          @placeholder="e.g. 5"
-          @hint="-1 = Pre-K, 0 = K"
+          @placeholder="Any"
           @id="league-min-grade"
-          {{on "input" (fn this.updateField "minGrade")}}
+          {{on "change" (fn this.updateField "minGrade")}}
         />
-        <UiInput
+        <UiGradeLevelSelect
           @label="Max Grade"
           @value={{@league.maxGrade}}
-          @type="number"
-          @placeholder="e.g. 6"
+          @placeholder="Any"
           @id="league-max-grade"
-          {{on "input" (fn this.updateField "maxGrade")}}
+          {{on "change" (fn this.updateField "maxGrade")}}
         />
       </div>
 
