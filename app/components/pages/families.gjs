@@ -14,7 +14,6 @@ function parentsOf(memberships) {
   return memberships.filter((m) => m.role === 'parent' || m.role === 'guardian');
 }
 
-
 @args({
   org: { required: true },
 })

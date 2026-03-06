@@ -10,6 +10,7 @@ Router.map(function () {
   this.route('login');
   this.route('signup');
   this.route('join', { path: '/join/:org_slug' });
+  this.route('join-family', { path: '/join-family/:token' });
   this.route('my-family', function () {
     this.route('family', { path: '/:family_id' });
   });

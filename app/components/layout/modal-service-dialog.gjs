@@ -1,5 +1,5 @@
 import Component from '@glimmer/component';
-import { service, on, fn, action, args } from 'frontend/utils/stdlib';
+import { service, on, fn, args } from 'frontend/utils/stdlib';
 import { UiModal, UiButton } from 'frontend/components/ui';
 
 @args({

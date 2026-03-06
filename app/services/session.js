@@ -146,7 +146,7 @@ export default class SessionService extends Service {
     }
   }
 
-  invalidate() {
+  invalidate = () => {
     this.accessToken = null;
     this.refreshToken = null;
     this.currentUser = null;

@@ -8,14 +8,15 @@ function roleLabel(role) {
   if (role === 'guardian') return 'Guardian';
   if (role === 'parent') return 'Parent';
   if (role === 'child') return 'Child';
+  if (role === 'viewer') return 'Viewer';
   return role;
 }
 
 @args({
   paginator: { type: Paginator, required: true },
-  onAddChild: { type: 'function' },
-  onEditChild: { type: 'function' },
-  onRemoveChild: { type: 'function' },
+  onAddChild: { type: 'function', allowNull: true },
+  onEditChild: { type: 'function', allowNull: true },
+  onRemoveChild: { type: 'function', allowNull: true },
 })
 export default class FamilyMemberList extends Component {
   get memberships() {
@@ -28,6 +29,10 @@ export default class FamilyMemberList extends Component {
 
   get children() {
     return this.memberships.filter((m) => m.role === 'child');
+  }
+
+  get viewers() {
+    return this.memberships.filter((m) => m.role === 'viewer');
   }
 
   <template>
@@ -80,6 +85,20 @@ export default class FamilyMemberList extends Component {
           <p class="text-secondary text-sm">No children added yet. Add your children to register them for activities.</p>
         {{/if}}
       </div>
+
+      {{#if this.viewers.length}}
+        <div class="mt-4">
+          <h3 class="text-sm font-medium text-secondary mb-2">Viewers</h3>
+          <ul class="member-list">
+            {{#each this.viewers as |membership|}}
+              <li class="member-list__item">
+                <span class="font-medium">{{membership.user.fullName}}</span>
+                <span class="text-secondary text-sm">{{roleLabel membership.role}}</span>
+              </li>
+            {{/each}}
+          </ul>
+        </div>
+      {{/if}}
     </Await>
   </template>
 }

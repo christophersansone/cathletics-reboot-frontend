@@ -1,7 +1,7 @@
 import Route from '@ember/routing/route';
 import { service } from '@ember/service';
 
-const PUBLIC_ROUTES = ['login', 'signup'];
+const PUBLIC_ROUTES = ['login', 'signup', 'join-family'];
 
 export default class ApplicationRoute extends Route {
   @service session;
