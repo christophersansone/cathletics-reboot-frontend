@@ -66,14 +66,20 @@ export default class RosterTab extends Component {
       {{/if}}
 
       {{#if this.players.length}}
-        <div class="roster-section">
+        <div class="roster-section players">
           <h3 class="roster-section__title">Players</h3>
           <ul class="roster-list">
             {{#each this.players as |membership|}}
               <li class="roster-list__item">
+                {{#if membership.uniformNumber}}
+                  <span class="roster-list__number">{{membership.uniformNumber}}</span>
+                {{/if}}
                 <Await @promise={{membership.user}} as |user|>
                   <span class="roster-list__name">{{user.fullName}}</span>
                 </Await>
+                {{#if membership.position}}
+                  <span class="roster-list__position">{{membership.position}}</span>
+                {{/if}}
               </li>
             {{/each}}
           </ul>

@@ -28,6 +28,18 @@ export default class TeamMembershipListComponent extends Component {
     this.alerts.success('Role updated.');
   });
 
+  updateUniformNumber = task(async (membership, event) => {
+    const value = event.target.value.trim() || null;
+    if (value === membership.uniformNumber) return;
+    await this.atomic.patchModel(membership, { uniformNumber: value });
+  });
+
+  updatePosition = task(async (membership, event) => {
+    const value = event.target.value.trim() || null;
+    if (value === membership.position) return;
+    await this.atomic.patchModel(membership, { position: value });
+  });
+
   removeMember = task(async (membership) => {
     const user = await membership.user;
     const name = user?.fullName || 'this member';
@@ -44,6 +56,8 @@ export default class TeamMembershipListComponent extends Component {
         <table class="data-table">
           <thead>
             <tr>
+              <th>#</th>
+              <th>Position</th>
               <th>Name</th>
               <th>Role</th>
               <th class="data-table__actions-col"></th>
@@ -53,6 +67,27 @@ export default class TeamMembershipListComponent extends Component {
             <InfiniteScroll @paginator={{@paginator}} @occlude={{true}} @scrollElement=".app-content">
               <:item as |membership|>
                 <tr>
+                  <td class="data-table__num-col">
+                    <input
+                      type="text"
+                      inputmode="numeric"
+                      aria-label="Uniform number"
+                      class="form-input form-input--inline form-input--num"
+                      value={{membership.uniformNumber}}
+                      placeholder="—"
+                      {{on "change" (fn this.updateUniformNumber.perform membership)}}
+                    />
+                  </td>
+                  <td>
+                    <input
+                      type="text"
+                      aria-label="Position"
+                      class="form-input form-input--inline"
+                      value={{membership.position}}
+                      placeholder="—"
+                      {{on "change" (fn this.updatePosition.perform membership)}}
+                    />
+                  </td>
                   <td class="font-medium">
                     <Await @promise={{membership.user}} as |user|>
                       {{user.fullName}}
@@ -81,19 +116,19 @@ export default class TeamMembershipListComponent extends Component {
 
               <:sentinel as |sentinelModifier|>
                 <tr {{sentinelModifier}}>
-                  <td colspan="3" class="infinite-scroll-page-sentinel"></td>
+                  <td colspan="4" class="infinite-scroll-page-sentinel"></td>
                 </tr>
               </:sentinel>
 
               <:loading as |loadingModifier|>
                 <tr {{loadingModifier}}>
-                  <td colspan="3"><LoadingIndicator /></td>
+                  <td colspan="4"><LoadingIndicator /></td>
                 </tr>
               </:loading>
 
               <:empty>
                 <tr>
-                  <td colspan="3">
+                  <td colspan="4">
                     <div class="empty-state">
                       <p class="empty-state__message">No members yet</p>
                       <p class="empty-state__hint">Add players, coaches, and staff to this team's roster.</p>

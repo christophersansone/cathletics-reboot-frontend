@@ -70,6 +70,17 @@
     min-width: 120px;
   }
 
+  .form-input--inline {
+    width: auto;
+    padding: var(--space-1) var(--space-2);
+    font-size: 0.8125rem;
+  }
+
+  .form-input--num {
+    width: 3.5rem;
+    text-align: center;
+  }
+
   .form-row {
     display: grid;
     grid-template-columns: 1fr;

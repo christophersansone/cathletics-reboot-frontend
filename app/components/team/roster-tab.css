@@ -27,14 +27,31 @@
 .roster-list__item {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: var(--space-3);
-  padding: var(--space-2) var(--space-3);
+  padding: var(--space-1) var(--space-3);
   border-radius: var(--radius-md);
   background: var(--color-bg-raised);
   border: 1px solid var(--color-border);
 }
 
-.roster-list__name {
-  font-weight: 500;
+.roster-list__number {
+  color: var(--color-text-secondary);
+  min-width: 1.75rem;
+  text-align: center;
+  flex-shrink: 0;
 }
+
+.roster-list__name {
+  flex: 1;
+}
+
+.roster-list__position {
+  flex: 0;
+}
+
+.roster-section.players .roster-list__name,
+.roster-section.players .roster-list__number {
+  font-family: Varsity, Inter, sans-serif;
+  font-size: 1.8rem;
+}
+
