@@ -1,5 +1,5 @@
 import ScheduleTab from 'frontend/components/team/schedule-tab';
 
 <template>
-  <ScheduleTab />
+  <ScheduleTab @team={{@model}} />
 </template>

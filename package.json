@@ -92,6 +92,7 @@
   "dependencies": {
     "ember-inflector": "^6.0.0",
     "ember-truth-helpers": "^5.0.0",
+    "ical.js": "^2.2.1",
     "luxon": "^3.7.2"
   }
 }

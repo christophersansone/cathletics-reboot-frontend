@@ -47,4 +47,22 @@ export default class ApplicationAdapter extends JSONAPIAdapter {
   _isUnauthorized(error) {
     return error?.errors?.some((e) => String(e.status) === '401');
   }
+
+  /**
+   * Performs a request that returns a non-JSON body (e.g. text/calendar).
+   * Uses same URL and headers as the adapter; handles 401 refresh like ajax().
+   */
+  async requestWithAuth(url, method) {
+    let response = await fetch(url, { method, headers: this.headers });
+    if (response.status === 401 && this.session.refreshToken) {
+      const refreshed = await this.session.refreshAccessToken();
+      if (refreshed) {
+        response = await fetch(url, { method, headers: this.headers });
+      }
+    }
+    if (response.status === 401 && this.session.isAuthenticated) {
+      this.session.invalidate();
+    }
+    return response;
+  }
 }

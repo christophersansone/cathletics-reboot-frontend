@@ -131,19 +131,12 @@ export default class SessionService extends Service {
     if (!this.isAuthenticated) return null;
     if (this.currentUser) return this.currentUser;
 
-    try {
-      let response = await fetch(`${config.APP.apiHost}/${config.APP.apiNamespace}/me`, {
-        headers: { 'Authorization': `Bearer ${this.accessToken}` },
-      });
-
-      if (!response.ok) throw new Error('Failed to load user');
-
-      let payload = await response.json();
-      this.store.pushPayload(payload);
-      this.currentUser = this.store.peekRecord('user', payload.data.id);
-    } catch {
-      this.invalidate();
-    }
+    //try {
+      this.currentUser = await this.store.adapterFor('user').me();
+    //} catch {
+    //  debugger;
+    //  this.invalidate();
+    //}
   }
 
   invalidate = () => {

@@ -21,8 +21,12 @@ export default class ModelErrors extends Component {
       return this.adapterErrorMessages(this.args.error);
     }
 
-    if (this.args.error) {
+    if (this.args.error?.status) {
       return [ this.errorMessageFromStatus(this.args.error) ];
+    }
+
+    if (this.args.error) {
+      return [ this.args.error.message ?? this.args.error ];
     }
 
     return [];
