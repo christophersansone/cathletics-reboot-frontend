@@ -4,13 +4,16 @@ import { service } from '@ember/service';
 export default class TeamRoute extends Route {
   @service store;
 
-  model(params) {
-    return this.store.findRecord('team', params.team_id);
+  async model(params) {
+    const team = await this.store.findRecord('team', params.team_id);
+    const org = this.modelFor('orgs.org');
+    return { team, org };
   }
 
   async breadcrumbParents(model) {
-    const org = this.modelFor('orgs.org');
-    const league = await model.league;
+    const team = model.team;
+    const org = model.org;
+    const league = await team.league;
     const season = await league.season;
     const activityType = await season.activityType;
     return [
@@ -22,6 +25,6 @@ export default class TeamRoute extends Route {
   }
 
   breadcrumb(model) {
-    return { title: model.name };
+    return { title: model.team.name };
   }
 }

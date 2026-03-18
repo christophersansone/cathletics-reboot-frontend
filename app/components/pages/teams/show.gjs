@@ -1,10 +1,11 @@
 import Component from '@glimmer/component';
-import { cached, service, on, array, LinkTo, args } from 'frontend/utils/stdlib';
+import { cached, service, on, array, LinkTo, args, tracked, eq, fn, action } from 'frontend/utils/stdlib';
 import { task } from 'ember-concurrency';
-import { UiButton } from 'frontend/components/ui';
+import { UiButton, UiTabs } from 'frontend/components/ui';
 import { Breadcrumbs, DetailHeader } from 'frontend/components/layout';
 import TeamMembershipList from 'frontend/components/team-membership/list';
 import TeamMembershipModalComponent, { AddMemberModal } from 'frontend/components/team-membership/modal';
+import ScheduleTab from 'frontend/components/team/schedule-tab';
 
 @args({
   team: { required: true },
@@ -20,6 +21,8 @@ export default class TeamShowPage extends Component {
   @service router;
   @service alerts;
   @service modal;
+
+  @tracked activeTab = 'Roster';
 
   @cached
   get rosterPaginator() {
@@ -52,6 +55,11 @@ export default class TeamShowPage extends Component {
     return results.slice();
   });
 
+  @action
+  setActiveTab(tab) {
+    this.activeTab = tab;
+  }
+
   <template>
     <Breadcrumbs />
 
@@ -76,11 +84,21 @@ export default class TeamShowPage extends Component {
       </:meta>
     </DetailHeader>
 
-    <div class="section-header">
-      <h2 class="section-header__title">Roster</h2>
-      <UiButton @size="sm" {{on "click" this.addMember.perform}}>Add Member</UiButton>
-    </div>
-
-    <TeamMembershipList @paginator={{this.rosterPaginator}} @onCreate={{this.addMember.perform}} />
+    <UiTabs @activeTab={{this.activeTab}} @tabs={{array 'Roster' 'Schedule'}} @onChange={{this.setActiveTab}}>
+      <:tab as |activeTab|>
+        {{activeTab}}
+      </:tab>
+      <:content as |activeTab|>
+        {{#if (eq activeTab "Roster")}}
+          <div class="section-header">
+            <h2 class="section-header__title">Roster</h2>
+            <UiButton @size="sm" {{on "click" this.addMember.perform}}>Add Member</UiButton>
+          </div>
+          <TeamMembershipList @paginator={{this.rosterPaginator}} @onCreate={{this.addMember.perform}} />
+        {{else}}
+          <ScheduleTab @team={{@team}} />
+        {{/if}}
+      </:content>
+    </UiTabs>
   </template>
 }

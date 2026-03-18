@@ -1,11 +1,24 @@
 import Component from '@glimmer/component';
-import { Errors, action, tracked, on, not, args } from 'frontend/utils/stdlib';
+import { Errors, action, tracked, on, not, args, eq, fn } from 'frontend/utils/stdlib';
 import { UiModal, UiButton, UiInput } from 'frontend/components/ui';
 import { ModalDialog } from 'frontend/services/modal';
 import { task } from 'ember-concurrency';
 import preventDefault from 'frontend/helpers/prevent-default';
 import { toLocalInputValue, fromLocalInputValue } from 'frontend/utils/datetime';
 import { DateTime } from 'luxon';
+
+const RRULE_DAYS = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
+
+function buildRrule(frequency, startAt, weeklyDays) {
+  if (!frequency || frequency === 'none') return '';
+  if (frequency === 'daily') return 'FREQ=DAILY';
+  if (frequency === 'monthly') return 'FREQ=MONTHLY';
+  if (frequency === 'weekly') {
+    const days = weeklyDays.length ? weeklyDays : [RRULE_DAYS[startAt.weekday === 7 ? 0 : startAt.weekday]];
+    return `FREQ=WEEKLY;BYDAY=${days.join(',')}`;
+  }
+  return '';
+}
 
 export class CreateScheduledEventModal extends ModalDialog {
   atomic = null;
@@ -18,6 +31,10 @@ export class CreateScheduledEventModal extends ModalDialog {
   @tracked allDay = false;
   @tracked timeZone = '';
   @tracked description = '';
+  @tracked repeatFrequency = 'none';
+  @tracked weeklyDays = [];
+  @tracked exdates = [];
+  @tracked exdateToAdd = '';
 
   title_label = 'New Event';
 
@@ -46,8 +63,16 @@ export class CreateScheduledEventModal extends ModalDialog {
     return toLocalInputValue(this.endAt, this.timeZone);
   }
 
+  get rrule() {
+    return buildRrule(this.repeatFrequency, this.startAt, this.weeklyDays);
+  }
+
+  get exdatesForPayload() {
+    return this.exdates.map((d) => (typeof d === 'string' ? d : d.toISODate?.() ?? d));
+  }
+
   saveTask = task({ drop: true }, async () => {
-    const model = await this.atomic.createModel('scheduled-event', {
+    const payload = {
       title: this.title,
       description: this.description || undefined,
       startAt: this.startAt,
@@ -55,7 +80,11 @@ export class CreateScheduledEventModal extends ModalDialog {
       timeZone: this.timeZone,
       allDay: this.allDay,
       schedulable: this.team,
-    });
+    };
+    const rruleVal = this.rrule;
+    if (rruleVal) payload.rrule = rruleVal;
+    if (this.exdatesForPayload.length) payload.exdates = this.exdatesForPayload;
+    const model = await this.atomic.createModel('scheduled-event', payload);
     this.promise.resolve({ result: 'saved', model });
   });
 
@@ -106,16 +135,70 @@ export class CreateScheduledEventModal extends ModalDialog {
   updateAllDay(e) {
     this.allDay = e.target.checked;
   }
+
+  @action
+  setRepeatFrequency(e) {
+    this.repeatFrequency = e.target.value;
+    if (this.repeatFrequency !== 'weekly') this.weeklyDays = [];
+  }
+
+  @action
+  toggleWeeklyDay(day) {
+    const days = [...this.weeklyDays];
+    const i = days.indexOf(day);
+    if (i >= 0) days.splice(i, 1);
+    else days.push(day);
+    days.sort((a, b) => RRULE_DAYS.indexOf(a) - RRULE_DAYS.indexOf(b));
+    this.weeklyDays = days;
+  }
+
+  @action
+  addExdate() {
+    const str = this.exdateToAdd?.trim();
+    if (!str) return;
+    const dt = DateTime.fromISO(str);
+    if (!dt.isValid) return;
+    const iso = dt.toISODate();
+    if (this.exdates.includes(iso)) return;
+    this.exdates = [...this.exdates, iso];
+    this.exdateToAdd = '';
+  }
+
+  @action
+  removeExdate(index) {
+    this.exdates = this.exdates.filter((_, i) => i !== index);
+  }
+
+  @action
+  updateExdateToAdd(e) {
+    this.exdateToAdd = e.target.value;
+  }
+
+  isWeeklyDayChecked(day) {
+    return this.weeklyDays.includes(day);
+  }
 }
+
+const WEEKDAY_OPTIONS = [
+  { day: 'SU', label: 'Sun' }, { day: 'MO', label: 'Mon' }, { day: 'TU', label: 'Tue' },
+  { day: 'WE', label: 'Wed' }, { day: 'TH', label: 'Thu' }, { day: 'FR', label: 'Fri' },
+  { day: 'SA', label: 'Sat' },
+];
 
 @args({
   modalDialog: { type: ModalDialog, required: true },
 })
 export default class ScheduledEventModalComponent extends Component {
+  weekdayOptions = WEEKDAY_OPTIONS;
+
+  get modalDialog() {
+    return this.args.modalDialog;
+  }
+
   <template>
     <UiModal @title={{@modalDialog.title_label}} @onClose={{@modalDialog.cancel}}>
       <Errors @error={{@modalDialog.saveTask.last.error}} />
-      <form class="flex flex-col gap-4" {{on "submit" (preventDefault @modalDialog.save)}}>
+      <form class="flex flex-col gap-4 scheduled-event-modal" {{on "submit" (preventDefault @modalDialog.save)}}>
         <UiInput
           @label="Title"
           @value={{@modalDialog.title}}
@@ -130,12 +213,13 @@ export default class ScheduledEventModalComponent extends Component {
           @id="scheduled-event-description"
           {{on "input" @modalDialog.updateDescription}}
         />
-        <div class="form-row">
+        <div class="scheduled-event-modal__datetime-row">
           <UiInput
             @label="Start ({{@modalDialog.zoneAbbr}})"
             @value={{@modalDialog.startAtInputValue}}
             @type="datetime-local"
             @id="scheduled-event-start"
+            class="scheduled-event-modal__datetime-input"
             {{on "input" @modalDialog.updateStartAt}}
           />
           <UiInput
@@ -143,6 +227,7 @@ export default class ScheduledEventModalComponent extends Component {
             @value={{@modalDialog.endAtInputValue}}
             @type="datetime-local"
             @id="scheduled-event-end"
+            class="scheduled-event-modal__datetime-input"
             {{on "input" @modalDialog.updateEndAt}}
           />
         </div>
@@ -150,6 +235,67 @@ export default class ScheduledEventModalComponent extends Component {
           <input type="checkbox" checked={{@modalDialog.allDay}} {{on "change" @modalDialog.updateAllDay}} />
           <span class="text-sm">All day</span>
         </label>
+
+        <div class="form-group">
+          <span class="form-label">Repeat</span>
+          <select
+            class="form-select"
+            value={{@modalDialog.repeatFrequency}}
+            {{on "change" @modalDialog.setRepeatFrequency}}
+            id="scheduled-event-repeat"
+          >
+            <option value="none">None</option>
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+          </select>
+        </div>
+        {{#if (eq this.modalDialog.repeatFrequency "weekly")}}
+          <div class="form-group">
+            <span class="form-label">On days</span>
+            <div class="scheduled-event-modal__weekdays flex flex-wrap gap-2">
+              {{#each this.weekdayOptions as |opt|}}
+                <label class="flex items-center gap-1.5 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={{this.modalDialog.isWeeklyDayChecked opt.day}}
+                    {{on "change" (fn this.modalDialog.toggleWeeklyDay opt.day)}}
+                  />
+                  <span class="text-sm">{{opt.label}}</span>
+                </label>
+              {{/each}}
+            </div>
+          </div>
+        {{/if}}
+
+        <div class="form-group">
+          <span class="form-label">Exclude dates (optional)</span>
+          <p class="form-hint mb-2">Skip these dates in the series.</p>
+          <div class="flex flex-wrap gap-2 items-end">
+            <div class="form-group flex-1 min-w-[8rem]">
+              <label class="form-label visually-hidden" for="scheduled-event-exdate">Add date</label>
+              <input
+                id="scheduled-event-exdate"
+                type="date"
+                class="form-input"
+                value={{@modalDialog.exdateToAdd}}
+                {{on "input" this.modalDialog.updateExdateToAdd}}
+              />
+            </div>
+            <UiButton @variant="secondary" @type="button" {{on "click" @modalDialog.addExdate}}>Add</UiButton>
+          </div>
+          {{#if @modalDialog.exdates.length}}
+            <ul class="scheduled-event-modal__exdates mt-2 flex flex-wrap gap-2">
+              {{#each @modalDialog.exdates as |iso idx|}}
+                <li class="flex items-center gap-1.5 text-sm bg-secondary/10 rounded px-2 py-1">
+                  <span>{{iso}}</span>
+                  <button type="button" class="text-danger hover:underline" {{on "click" (fn this.modalDialog.removeExdate idx)}} aria-label="Remove">×</button>
+                </li>
+              {{/each}}
+            </ul>
+          {{/if}}
+        </div>
+
         <div class="flex gap-3 justify-end">
           <UiButton @variant="secondary" {{on "click" @modalDialog.cancel}}>Cancel</UiButton>
           <UiButton @type="submit" @loading={{@modalDialog.isSaving}} disabled={{not @modalDialog.canSave}}>

@@ -1,6 +1,6 @@
 import { pageTitle } from 'ember-page-title';
 
 <template>
-  {{pageTitle @model.name}}
+  {{pageTitle @model.team.name}}
   {{outlet}}
 </template>
