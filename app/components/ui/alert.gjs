@@ -41,9 +41,9 @@ export default class UiAlert extends Component {
 
   <template>
     <div class="alert {{this.variantClass}}" role="alert" ...attributes>
-      <div class="alert__body">{{yield}}</div>
+      <div class="body">{{yield}}</div>
       {{#if @onDismiss}}
-        <button type="button" class="alert__close" aria-label="Dismiss" {{on "click" this.dismiss}}>&times;</button>
+        <button type="button" class="close" aria-label="Dismiss" {{on "click" this.dismiss}}>&times;</button>
       {{/if}}
     </div>
   </template>

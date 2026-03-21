@@ -32,9 +32,9 @@ export default class MyFamilyIndexPage extends Component {
     <div class="member-page">
         {{#if @families.length}}
           <UiCard @title="My Families">
-            <ul class="family-list">
+            <ul class="list">
               {{#each @families as |family|}}
-                <li class="family-list__item">
+                <li class="item">
                   <LinkTo @route="my-family.family" @model={{family.id}} class="font-medium text-link">
                     {{family.name}}
                   </LinkTo>

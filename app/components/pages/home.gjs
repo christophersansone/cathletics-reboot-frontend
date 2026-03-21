@@ -51,22 +51,22 @@ export default class HomePage extends Component {
 
   <template>
     <div class="member-page">
-      <section class="home-section">
-          <h2 class="home-section__title">My Activities</h2>
+      <section class="section">
+          <h2 class="title">My Activities</h2>
 
           {{#if this.hasRegistrations}}
             {{#each this.registrationGroups as |group|}}
               <UiCard @title={{group.organization.name}}>
-                <ul class="activity-list">
+                <ul class="list">
                   {{#each group.items as |reg|}}
-                    <li class="activity-list__item">
-                      <div class="activity-list__main">
+                    <li class="item">
+                      <div class="main">
                         {{#if reg.team}}
-                          <LinkTo @route="teams.team" @model={{reg.team.id}} class="activity-list__name activity-list__link">
+                          <LinkTo @route="teams.team" @model={{reg.team.id}} class="name link">
                             {{reg.activityType.name}}: {{reg.league.name}}
                           </LinkTo>
                         {{else}}
-                          <span class="activity-list__name">{{reg.activityType.name}}: {{reg.league.name}}</span>
+                          <span class="name">{{reg.activityType.name}}: {{reg.league.name}}</span>
                         {{/if}}
                         <span class="text-secondary text-sm">
                           {{reg.season.name}}
@@ -75,7 +75,7 @@ export default class HomePage extends Component {
                           {{/if}}
                         </span>
                       </div>
-                      <div class="activity-list__meta">
+                      <div class="meta">
                         <span class="text-sm">{{reg.user.fullName}}</span>
                         <UiBadge @variant={{statusVariant reg.status}}>{{statusLabel reg.status}}</UiBadge>
                       </div>
@@ -91,20 +91,20 @@ export default class HomePage extends Component {
           {{/if}}
         </section>
 
-        <section class="home-section">
-          <h2 class="home-section__title">Open Registration</h2>
+        <section class="section">
+          <h2 class="title">Open Registration</h2>
 
           {{#if this.hasOpenLeagues}}
             {{#each this.leagueGroups as |group|}}
               <UiCard @title={{group.organization.name}}>
-                <ul class="activity-list">
+                <ul class="list">
                   {{#each group.items as |league|}}
-                    <li class="activity-list__item">
-                      <div class="activity-list__main">
-                        <span class="activity-list__name">{{league.activityType.name}}: {{league.name}}</span>
+                    <li class="item">
+                      <div class="main">
+                        <span class="name">{{league.activityType.name}}: {{league.name}}</span>
                         <span class="text-secondary text-sm">{{league.season.name}}</span>
                       </div>
-                      <div class="activity-list__meta">
+                      <div class="meta">
                         <span class="text-secondary text-sm">
                           {{#each league.eligibleMembers as |member index|}}
                             {{if index ", "}}{{member.fullName}}

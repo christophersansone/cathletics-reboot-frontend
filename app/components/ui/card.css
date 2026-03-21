@@ -5,7 +5,7 @@
   box-shadow: var(--shadow-sm);
 }
 
-.card__header {
+.header {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -13,15 +13,15 @@
   border-bottom: 1px solid var(--color-border);
 }
 
-.card__title {
+.title {
   font-size: 1rem;
   font-weight: 600;
 }
 
-.card__body {
+.body {
   padding: var(--space-6);
 }
 
-.card--no-pad .card__body {
+.card--no-pad .body {
   padding: 0;
 }

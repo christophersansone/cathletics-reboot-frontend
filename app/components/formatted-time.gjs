@@ -16,8 +16,8 @@ export default class FormattedTime extends Component {
       <span class="formatted-time" ...attributes>
         <span>{{this.display.formatted}}</span>
         {{#unless this.display.sameAsLocal}}
-          <span class="formatted-time__zone">{{this.display.zone}}</span>
-          <span class="formatted-time__local">({{this.display.localTime}} your time)</span>
+          <span class="zone">{{this.display.zone}}</span>
+          <span class="local">({{this.display.localTime}} your time)</span>
         {{/unless}}
       </span>
     {{/if}}

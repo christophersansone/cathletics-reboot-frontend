@@ -1,19 +1,19 @@
 /* Keep start and end datetime on one row and prevent overflow */
-.scheduled-event-modal__datetime-row {
+.datetime-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: var(--space-4);
 }
 
-.scheduled-event-modal__datetime-row > * {
+.datetime-row > * {
   min-width: 0;
 }
 
-.scheduled-event-modal__weekdays {
+.weekdays {
   margin-top: var(--space-1);
 }
 
-.scheduled-event-modal__exdates {
+.exdates {
   list-style: none;
   padding: 0;
   margin: 0;

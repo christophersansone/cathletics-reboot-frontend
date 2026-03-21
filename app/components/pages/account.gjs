@@ -16,11 +16,11 @@ export default class AccountPage extends Component {
 
       <UiCard @title="Profile">
         <div class="account-info">
-          <div class="account-info__row">
+          <div class="row">
             <span class="text-secondary text-sm">Name</span>
             <span class="font-medium">{{this.session.currentUser.fullName}}</span>
           </div>
-          <div class="account-info__row">
+          <div class="row">
             <span class="text-secondary text-sm">Email</span>
             <span class="font-medium">{{this.session.currentUser.email}}</span>
           </div>
@@ -29,22 +29,22 @@ export default class AccountPage extends Component {
 
       <UiCard @title="Navigation">
         <nav class="account-nav">
-          <LinkTo @route="my-family" class="account-nav__link">
+          <LinkTo @route="my-family" class="link">
             <span>My Family</span>
-            <span class="account-nav__chevron">&rsaquo;</span>
+            <span class="chevron">&rsaquo;</span>
           </LinkTo>
-          <LinkTo @route="orgs" class="account-nav__link">
+          <LinkTo @route="orgs" class="link">
             <span>My Organizations</span>
-            <span class="account-nav__chevron">&rsaquo;</span>
+            <span class="chevron">&rsaquo;</span>
           </LinkTo>
         </nav>
       </UiCard>
 
       <UiCard @title="Preferences">
         <div class="account-nav">
-          <button type="button" class="account-nav__link" {{on "click" this.toggleTheme}}>
+          <button type="button" class="link" {{on "click" this.toggleTheme}}>
             <span>{{if this.theme.isDark "Switch to Light Mode" "Switch to Dark Mode"}}</span>
-            <span class="account-nav__chevron">&rsaquo;</span>
+            <span class="chevron">&rsaquo;</span>
           </button>
         </div>
       </UiCard>

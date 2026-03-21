@@ -9,12 +9,12 @@
   line-height: 1.5;
 }
 
-.alert__body {
+.body {
   flex: 1;
   min-width: 0;
 }
 
-.alert__close {
+.close {
   flex-shrink: 0;
   display: flex;
   align-items: center;
@@ -33,7 +33,7 @@
   transition: opacity var(--transition-fast);
 }
 
-.alert__close:hover {
+.close:hover {
   opacity: 1;
 }
 

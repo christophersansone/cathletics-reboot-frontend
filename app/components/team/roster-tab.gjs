@@ -50,13 +50,13 @@ export default class RosterTab extends Component {
   <template>
     <Await @promise={{this.membershipsPaginator.firstPage}} @showLatest={{true}}>
       {{#if this.coaches.length}}
-        <div class="roster-section">
-          <h3 class="roster-section__title">Coaches & Staff</h3>
-          <ul class="roster-list">
+        <div class="section">
+          <h3 class="title">Coaches & Staff</h3>
+          <ul class="list">
             {{#each this.coaches as |membership|}}
-              <li class="roster-list__item">
+              <li class="item">
                 <Await @promise={{membership.user}} as |user|>
-                  <span class="roster-list__name">{{user.fullName}}</span>
+                  <span class="name">{{user.fullName}}</span>
                 </Await>
                 <UiBadge @variant={{roleVariant membership.role}}>{{roleLabel membership.role}}</UiBadge>
               </li>
@@ -66,19 +66,19 @@ export default class RosterTab extends Component {
       {{/if}}
 
       {{#if this.players.length}}
-        <div class="roster-section players">
-          <h3 class="roster-section__title">Players</h3>
-          <ul class="roster-list">
+        <div class="section players">
+          <h3 class="title">Players</h3>
+          <ul class="list">
             {{#each this.players as |membership|}}
-              <li class="roster-list__item">
+              <li class="item">
                 {{#if membership.uniformNumber}}
-                  <span class="roster-list__number">{{membership.uniformNumber}}</span>
+                  <span class="number">{{membership.uniformNumber}}</span>
                 {{/if}}
                 <Await @promise={{membership.user}} as |user|>
-                  <span class="roster-list__name">{{user.fullName}}</span>
+                  <span class="name">{{user.fullName}}</span>
                 </Await>
                 {{#if membership.position}}
-                  <span class="roster-list__position">{{membership.position}}</span>
+                  <span class="position">{{membership.position}}</span>
                 {{/if}}
               </li>
             {{/each}}

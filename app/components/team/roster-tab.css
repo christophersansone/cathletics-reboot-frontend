@@ -1,12 +1,12 @@
-.roster-section {
+.section {
   margin-bottom: var(--space-4);
 }
 
-.roster-section:last-child {
+.section:last-child {
   margin-bottom: 0;
 }
 
-.roster-section__title {
+.section .title {
   font-size: 0.75rem;
   font-weight: 600;
   text-transform: uppercase;
@@ -15,7 +15,7 @@
   margin-bottom: var(--space-2);
 }
 
-.roster-list {
+.list {
   list-style: none;
   padding: 0;
   margin: 0;
@@ -24,7 +24,7 @@
   gap: var(--space-1);
 }
 
-.roster-list__item {
+.list .item {
   display: flex;
   align-items: center;
   gap: var(--space-3);
@@ -34,23 +34,23 @@
   border: 1px solid var(--color-border);
 }
 
-.roster-list__number {
+.list .number {
   color: var(--color-text-secondary);
   min-width: 1.75rem;
   text-align: center;
   flex-shrink: 0;
 }
 
-.roster-list__name {
+.list .name {
   flex: 1;
 }
 
-.roster-list__position {
+.list .position {
   flex: 0;
 }
 
-.roster-section.players .roster-list__name,
-.roster-section.players .roster-list__number {
+.section.players .list .name,
+.section.players .list .number {
   font-family: Varsity, Inter, sans-serif;
   font-size: 1.8rem;
 }

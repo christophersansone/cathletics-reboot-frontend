@@ -10,14 +10,14 @@ export default class UiCard extends Component {
   <template>
     <div class={{this.classes}} ...attributes>
       {{#if @title}}
-        <div class="card__header">
-          <h3 class="card__title">{{@title}}</h3>
+        <div class="header">
+          <h3 class="title">{{@title}}</h3>
           {{#if (has-block "actions")}}
-            <div class="card__actions">{{yield to="actions"}}</div>
+            <div class="actions">{{yield to="actions"}}</div>
           {{/if}}
         </div>
       {{/if}}
-      <div class="card__body">
+      <div class="body">
         {{yield}}
       </div>
     </div>

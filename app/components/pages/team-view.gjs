@@ -11,13 +11,13 @@ export default class TeamViewPage extends Component {
 
   <template>
     <div class="member-page team-view">
-      <div class="team-view__header">
-        <h1 class="team-view__name">{{this.team.name}}</h1>
+      <div class="header">
+        <h1 class="name">{{this.team.name}}</h1>
         <Await @promise={{this.team.league}} as |league|>
           <Await @promise={{league.season}} as |season|>
             <Await @promise={{season.activityType}} as |activityType|>
               <Await @promise={{activityType.organization}} as |org|>
-                <p class="team-view__context">
+                <p class="context">
                   {{org.name}} &middot; {{activityType.name}} &middot; {{season.name}}
                   {{#if league.name}}
                     &middot; {{league.name}}
@@ -31,19 +31,19 @@ export default class TeamViewPage extends Component {
         </Await>
       </div>
 
-      <nav class="team-tabs">
-        <LinkTo @route="teams.team.roster" @model={{this.team.id}} class="team-tabs__tab">
+      <nav class="tabs">
+        <LinkTo @route="teams.team.roster" @model={{this.team.id}} class="tab">
           Roster
         </LinkTo>
-        <LinkTo @route="teams.team.schedule" @model={{this.team.id}} class="team-tabs__tab">
+        <LinkTo @route="teams.team.schedule" @model={{this.team.id}} class="tab">
           Schedule
         </LinkTo>
-        <LinkTo @route="teams.team.chat" @model={{this.team.id}} class="team-tabs__tab">
+        <LinkTo @route="teams.team.chat" @model={{this.team.id}} class="tab">
           Chat
         </LinkTo>
       </nav>
 
-      <div class="team-view__content">
+      <div class="content">
         {{yield}}
       </div>
     </div>

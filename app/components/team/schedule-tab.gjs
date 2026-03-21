@@ -1,12 +1,15 @@
 import Component from '@glimmer/component';
-import { tracked, args, service, on } from 'frontend/utils/stdlib';
+import { tracked, args, service, on, action, fn } from 'frontend/utils/stdlib';
 import { task } from 'ember-concurrency';
 import { DateTime } from 'luxon';
 import { UiCard, UiButton } from 'frontend/components/ui';
 import { Await, Errors } from 'frontend/utils/stdlib';
 import FormattedTime from 'frontend/components/formatted-time';
 import { parseIcalToOccurrences } from 'frontend/utils/parse-ical-occurrences';
-import ScheduledEventModalComponent, { CreateScheduledEventModal } from 'frontend/components/scheduled-event/modal';
+import { appendRruleUntil } from 'frontend/utils/rrule-until';
+import ScheduledEventModalComponent, { CreateScheduledEventModal, EditScheduledEventModal } from 'frontend/components/scheduled-event/modal';
+import OccurrenceIntentModalComponent, { OccurrenceIntentModal } from 'frontend/components/team/occurrence-intent-modal';
+import CancelReasonModalComponent, { CancelReasonModal } from 'frontend/components/team/cancel-reason-modal';
 
 @args({
   team: { required: true },
@@ -79,10 +82,101 @@ export default class ScheduleTab extends Component {
     }
   });
 
+  /** @param {{ startAt: string, eventId: string, isRecurring?: boolean }} occ */
+  async getScope(occ, actionName) {
+    if (!occ.isRecurring) return { scope: 'this_one' };
+    const intent = new OccurrenceIntentModal({ action: actionName, occurrence: occ });
+    const result = await this.modal.execute(intent, OccurrenceIntentModalComponent);
+    return result;
+  }
+
+  @action
+  async openRemoveOccurrence(occ) {
+    const result = await this.getScope(occ, 'remove');
+    if (result == null) return;
+    const event = await this.store.findRecord('scheduled-event', occ.eventId);
+    try {
+      if (result.scope === 'this_one') {
+        const exdates = [...(event.exdates || []), occ.startAt];
+        await this.atomic.updateModel(event, { exdates });
+        this.alerts.success('Event removed from schedule.');
+      } else {
+        const untilIso = new Date(new Date(occ.startAt).getTime() - 1000).toISOString();
+        const newRrule = appendRruleUntil(event.rrule, untilIso);
+        await this.atomic.updateModel(event, { rrule: newRrule });
+        this.alerts.success('All future occurrences removed.');
+      }
+      await this.loadOccurrencesTask.perform();
+    } catch (e) {
+      this.alerts.error(e?.message ?? 'Failed to remove.');
+    }
+  }
+
+  @action
+  async openCancelOccurrence(occ) {
+    const result = await this.getScope(occ, 'cancel');
+    if (result == null) return;
+    const reasonModal = new CancelReasonModal();
+    const reasonResult = await this.modal.execute(reasonModal, CancelReasonModalComponent);
+    if (reasonResult == null) return;
+    const event = await this.store.findRecord('scheduled-event', occ.eventId);
+    const reason = reasonResult.reason ?? '';
+    try {
+      if (result.scope === 'this_one') {
+        const existing = (event.cancelledOccurrences || []).map((o) => ({
+          start_at: o.start_at ?? o.startAt,
+          reason: o.reason ?? '',
+        }));
+        const cancelledOccurrences = [...existing, { start_at: occ.startAt, reason }];
+        await this.atomic.updateModel(event, { cancelledOccurrences });
+        this.alerts.success('Occurrence cancelled.');
+      } else {
+        await this.atomic.updateModel(event, {
+          cancelledFrom: occ.startAt,
+          cancellationReason: reason,
+        });
+        this.alerts.success('All future occurrences cancelled.');
+      }
+      await this.loadOccurrencesTask.perform();
+    } catch (e) {
+      this.alerts.error(e?.message ?? 'Failed to cancel.');
+    }
+  }
+
+  @action
+  async openEditOccurrence(occ) {
+    const result = await this.getScope(occ, 'edit');
+    if (result == null) return;
+    const event = await this.store.findRecord('scheduled-event', occ.eventId);
+    let defaultTimeZone = 'America/Chicago';
+    try {
+      const league = await this.args.team.league;
+      const season = await league.season;
+      const activityType = await season.activityType;
+      const org = await activityType.organization;
+      if (org?.timeZone) defaultTimeZone = org.timeZone;
+    } catch {
+      // use default timezone
+    }
+    const modalDialog = new EditScheduledEventModal({
+      event,
+      occurrence: occ,
+      team: this.args.team,
+      scope: result.scope,
+      atomic: this.atomic,
+      defaultTimeZone,
+    });
+    const modalResult = await this.modal.execute(modalDialog, ScheduledEventModalComponent);
+    if (modalResult?.result === 'saved') {
+      this.alerts.success(result.scope === 'this_one' ? 'Occurrence updated.' : 'Event updated.');
+      await this.loadOccurrencesTask.perform();
+    }
+  }
+
   <template>
     <UiCard>
-      <div class="schedule-tab__header flex flex-wrap gap-2 items-center justify-between">
-        <h2 class="schedule-tab__title text-lg font-semibold">Schedule</h2>
+      <div class="header flex flex-wrap gap-2 items-center justify-between">
+        <h2 class="title text-lg font-semibold">Schedule</h2>
         <UiButton @variant="primary" {{on "click" this.createEvent.perform}}>
           Add event
         </UiButton>
@@ -91,14 +185,26 @@ export default class ScheduleTab extends Component {
       <Await @promise={{this.occurrencesPromise}} @showLatest={{true}}>
         <:resolved as |occList|>
           {{#if occList.length}}
-            <ul class="schedule-tab__list">
+            <ul class="list">
               {{#each occList as |occ|}}
-                {{#unless occ.cancelled}}
-                  <li class="schedule-tab__item">
-                    <span class="schedule-tab__item-title">{{occ.title}}</span>
-                    <FormattedTime @value={{occ.startDt}} @zone={{occ.timeZone}} />
-                  </li>
-                {{/unless}}
+                <li class="item {{if occ.cancelled "item-cancelled"}}">
+                  <div class="item-main">
+                    <span class="item-title">{{occ.title}}</span>
+                    <span class="item-time">
+                      <FormattedTime @value={{occ.startDt}} @zone={{occ.timeZone}} />
+                    </span>
+                    {{#if occ.cancelled}}
+                      <span class="item-cancelled-label">Cancelled{{#if occ.cancellationReason}} – {{occ.cancellationReason}}{{/if}}</span>
+                    {{/if}}
+                  </div>
+                  <div class="item-actions">
+                    <button type="button" class="btn-link text-sm" {{on "click" (fn this.openEditOccurrence occ)}}>Edit</button>
+                    {{#unless occ.cancelled}}
+                      <button type="button" class="btn-link text-sm" {{on "click" (fn this.openCancelOccurrence occ)}}>Cancel</button>
+                    {{/unless}}
+                    <button type="button" class="btn-link text-sm text-danger" {{on "click" (fn this.openRemoveOccurrence occ)}}>Remove</button>
+                  </div>
+                </li>
               {{/each}}
             </ul>
           {{else}}

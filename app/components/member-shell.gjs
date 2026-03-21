@@ -39,34 +39,34 @@ export default class MemberShell extends Component {
   <template>
     <div class="member-shell">
       <header class="member-topbar">
-        <span class="member-topbar__brand">Cathletics</span>
-        <span class="member-topbar__user">{{this.session.currentUser.displayName}}</span>
+        <span class="brand">Cathletics</span>
+        <span class="user">{{this.session.currentUser.displayName}}</span>
       </header>
 
       <aside class="member-sidebar">
-        <div class="member-sidebar__header">
-          <span class="member-sidebar__brand">Cathletics</span>
+        <div class="header">
+          <span class="brand">Cathletics</span>
         </div>
-        <nav class="member-sidebar__nav">
-          <LinkTo @route="home" class="member-sidebar__link">
+        <nav class="nav">
+          <LinkTo @route="home" class="link">
             <HomeIcon />
             Home
           </LinkTo>
-          <LinkTo @route="register" class="member-sidebar__link">
+          <LinkTo @route="register" class="link">
             <RegisterIcon />
             Register
           </LinkTo>
-          <LinkTo @route="schedule" class="member-sidebar__link">
+          <LinkTo @route="schedule" class="link">
             <ScheduleIcon />
             Schedule
           </LinkTo>
-          <LinkTo @route="account" class="member-sidebar__link">
+          <LinkTo @route="account" class="link">
             <AccountIcon />
             Account
           </LinkTo>
         </nav>
-        <div class="member-sidebar__footer">
-          <span class="member-sidebar__user">{{this.session.currentUser.displayName}}</span>
+        <div class="footer">
+          <span class="user">{{this.session.currentUser.displayName}}</span>
         </div>
       </aside>
 

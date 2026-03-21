@@ -6,15 +6,15 @@ export default class OrgSelectorPage extends Component {
   <template>
     <div class="centered-layout">
       <div class="org-selector">
-        <div class="org-selector__header">
-          <h1 class="org-selector__title">Cathletics</h1>
+        <div class="header">
+          <h1 class="title">Cathletics</h1>
           <p class="text-secondary mt-1">Choose an organization</p>
         </div>
 
-        <div class="org-selector__list">
+        <div class="list">
           {{#each @orgs as |entry|}}
-            <LinkTo @route="orgs.org.dashboard" @model={{entry.org.slug}} class="org-selector__item">
-              <div class="org-selector__name">{{entry.org.name}}</div>
+            <LinkTo @route="orgs.org.dashboard" @model={{entry.org.slug}} class="item">
+              <div class="name">{{entry.org.name}}</div>
               <UiBadge @variant={{if (eq entry.role "admin") "primary" "default"}}>
                 {{entry.role}}
               </UiBadge>

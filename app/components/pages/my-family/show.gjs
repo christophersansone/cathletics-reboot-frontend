@@ -325,9 +325,9 @@ export default class MyFamilyShowPage extends Component {
               <Await @promise={{this.invitationsPaginator.firstPage}} @showLatest={{true}}>
                 {{#if this.invitationsPaginator.displayItems.length}}
                   <Errors @error={{this.revokeInvite.last.error}} />
-                  <ul class="member-list">
+                  <ul class="list">
                     {{#each this.invitationsPaginator.displayItems as |invitation|}}
-                      <li class="member-list__item">
+                      <li class="item">
                         <div class="flex-1">
                           <span class="font-medium invite-role-label">{{invitation.role}}</span>
                           <span class="text-secondary text-sm">

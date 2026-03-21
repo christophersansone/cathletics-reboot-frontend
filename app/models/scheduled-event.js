@@ -9,6 +9,9 @@ export default class ScheduledEventModel extends Model {
   @attr('boolean') allDay;
   @attr('string') rrule;
   @attr() exdates; // array of ISO date strings
+  @attr() cancelledOccurrences; // array of { start_at, reason }
+  @attr('date') cancelledFrom;
+  @attr('string') cancellationReason;
 
   @belongsTo('schedulable', { polymorphic: true, async: true, inverse: null }) schedulable;
 }

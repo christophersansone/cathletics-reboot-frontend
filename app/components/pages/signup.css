@@ -50,7 +50,7 @@
   color: var(--color-text);
 }
 
-.social-btn__icon {
+.social-btn .icon {
   width: 1.125rem;
   height: 1.125rem;
   flex-shrink: 0;

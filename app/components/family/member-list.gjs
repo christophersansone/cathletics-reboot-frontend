@@ -40,9 +40,9 @@ export default class FamilyMemberList extends Component {
       {{#if this.parents.length}}
         <div class="mb-4">
           <h3 class="text-sm font-medium text-secondary mb-2">Parents / Guardians</h3>
-          <ul class="member-list">
+          <ul class="list">
             {{#each this.parents as |membership|}}
-              <li class="member-list__item">
+              <li class="item">
                 <span class="font-medium">{{membership.user.fullName}}</span>
                 <span class="text-secondary text-sm">{{roleLabel membership.role}}</span>
               </li>
@@ -60,9 +60,9 @@ export default class FamilyMemberList extends Component {
         </div>
 
         {{#if this.children.length}}
-          <ul class="member-list">
+          <ul class="list">
             {{#each this.children as |membership|}}
-              <li class="member-list__item">
+              <li class="item">
                 <div class="flex-1">
                   <span class="font-medium">{{membership.user.fullName}}</span>
                   <span class="text-secondary text-sm">
@@ -89,9 +89,9 @@ export default class FamilyMemberList extends Component {
       {{#if this.viewers.length}}
         <div class="mt-4">
           <h3 class="text-sm font-medium text-secondary mb-2">Viewers</h3>
-          <ul class="member-list">
+          <ul class="list">
             {{#each this.viewers as |membership|}}
-              <li class="member-list__item">
+              <li class="item">
                 <span class="font-medium">{{membership.user.fullName}}</span>
                 <span class="text-secondary text-sm">{{roleLabel membership.role}}</span>
               </li>
