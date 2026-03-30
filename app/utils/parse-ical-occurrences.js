@@ -32,15 +32,15 @@ export function parseIcalToOccurrences(icalString) {
     const idProp = vevent.getFirstProperty('x-event-id') || vevent.getFirstProperty('X-EVENT-ID');
     if (idProp) eventId = String(idProp.getFirstValue());
 
+    // ical.js property names are lowercase in jCal (see ICAL.Component#getFirstProperty).
     let cancelled = false;
-    const statusProp = vevent.getFirstProperty('status') || vevent.getFirstProperty('STATUS');
-    if (statusProp) {
-      const v = statusProp.getFirstValue();
-      if (v && String(v).toUpperCase() === 'CANCELLED') cancelled = true;
+    const statusRaw = vevent.getFirstPropertyValue('status');
+    if (statusRaw != null && String(statusRaw).toUpperCase().trim() === 'CANCELLED') {
+      cancelled = true;
     }
     let cancellationReason = '';
-    const reasonProp = vevent.getFirstProperty('x-cancellation-reason') || vevent.getFirstProperty('X-CANCELLATION-REASON');
-    if (reasonProp) cancellationReason = String(reasonProp.getFirstValue() || '');
+    const reasonRaw = vevent.getFirstPropertyValue('x-cancellation-reason');
+    if (reasonRaw != null) cancellationReason = String(reasonRaw);
 
     let isRecurring = false;
     const recProp = vevent.getFirstProperty('x-recurring') || vevent.getFirstProperty('X-RECURRING');

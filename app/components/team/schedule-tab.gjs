@@ -64,12 +64,11 @@ export default class ScheduleTab extends Component {
 
   createEvent = task({ drop: true }, async () => {
     const team = this.args.team;
-    let defaultTimeZone = 'America/Chicago';
     const league = await team.league;
     const season = await league.season;
     const activityType = await season.activityType;
     const org = await activityType.organization;
-    if (org?.timeZone) defaultTimeZone = org.timeZone;
+    const defaultTimeZone = org.timeZone;
     const modalDialog = new CreateScheduledEventModal({
       team,
       atomic: this.atomic,

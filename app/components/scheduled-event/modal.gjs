@@ -42,7 +42,7 @@ export class CreateScheduledEventModal extends ModalDialog {
     super();
     this.atomic = atomic;
     this.team = team;
-    this.defaultTimeZone = defaultTimeZone || 'America/Chicago';
+    this.defaultTimeZone = defaultTimeZone;
     this.timeZone = this.defaultTimeZone;
     const now = DateTime.now().setZone(this.defaultTimeZone);
     const start = now.plus({ days: 1 }).set({ hour: 19, minute: 0, second: 0, millisecond: 0 });
