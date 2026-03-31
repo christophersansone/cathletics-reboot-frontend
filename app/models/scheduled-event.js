@@ -8,6 +8,8 @@ export default class ScheduledEventModel extends Model {
   @attr('string') timeZone;
   @attr('boolean') allDay;
   @attr('string') rrule;
+  /** Last calendar day (event TZ) the series may include; with `rrule`, defines recurrence. */
+  @attr('date-only') recursUntil;
   @attr() exdates; // array of ISO date strings
   @attr() cancelledOccurrences; // array of { start_at, reason }
   @attr('date') cancelledFrom;

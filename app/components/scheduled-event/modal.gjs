@@ -23,7 +23,7 @@ function buildRrule(frequency, startAt, weeklyDays) {
 export class CreateScheduledEventModal extends ModalDialog {
   atomic = null;
   team = null;
-  defaultTimeZone = 'America/Chicago';
+  defaultTimeZone = null;
 
   @tracked title = '';
   @tracked startAt = null;
@@ -33,6 +33,8 @@ export class CreateScheduledEventModal extends ModalDialog {
   @tracked description = '';
   @tracked repeatFrequency = 'none';
   @tracked weeklyDays = [];
+  /** ISO date yyyy-MM-dd; last calendar day (in timeZone) the series may occur */
+  @tracked recursUntil = '';
   @tracked exdates = [];
   @tracked exdateToAdd = '';
 
@@ -82,7 +84,10 @@ export class CreateScheduledEventModal extends ModalDialog {
       schedulable: this.team,
     };
     const rruleVal = this.rrule;
-    if (rruleVal) payload.rrule = rruleVal;
+    if (rruleVal && this.recursUntil) {
+      payload.rrule = rruleVal;
+      payload.recursUntil = this.recursUntil;
+    }
     if (this.exdatesForPayload.length) payload.exdates = this.exdatesForPayload;
     const model = await this.atomic.createModel('scheduled-event', payload);
     this.promise.resolve({ result: 'saved', model });
@@ -93,7 +98,13 @@ export class CreateScheduledEventModal extends ModalDialog {
   }
 
   get canSave() {
-    return this.title.trim().length > 0 && this.startAt && this.endAt && this.endAt > this.startAt;
+    if (!(this.title.trim().length > 0 && this.startAt && this.endAt && this.endAt > this.startAt)) {
+      return false;
+    }
+    if (this.repeatFrequency !== 'none') {
+      return Boolean(this.recursUntil && String(this.recursUntil).trim());
+    }
+    return true;
   }
 
   @action
@@ -140,6 +151,19 @@ export class CreateScheduledEventModal extends ModalDialog {
   setRepeatFrequency(e) {
     this.repeatFrequency = e.target.value;
     if (this.repeatFrequency !== 'weekly') this.weeklyDays = [];
+    if (this.repeatFrequency !== 'none') {
+      if (!this.recursUntil && this.startAt) {
+        this.recursUntil = this.startAt.setZone(this.timeZone).plus({ months: 2 }).toISODate();
+      }
+    } else {
+      this.recursUntil = '';
+    }
+  }
+
+  @action
+  updateRecursUntil(e) {
+    console.log(e.target.value)
+    this.recursUntil = e.target?.value ?? '';
   }
 
   @action
@@ -207,7 +231,9 @@ export class EditScheduledEventModal extends CreateScheduledEventModal {
     const endAt = occurrence.endAt ?? event.endAt;
     this.startAt = typeof startAt === 'string' ? DateTime.fromISO(startAt, { zone: 'utc' }) : startAt;
     this.endAt = typeof endAt === 'string' ? DateTime.fromISO(endAt, { zone: 'utc' }) : endAt;
-    if (this.scope === 'all_future' && event.rrule) {
+    if (this.scope === 'all_future' && event.recursUntil && event.rrule) {
+      const ru = event.recursUntil;
+      this.recursUntil = typeof ru === 'string' ? ru.split('T')[0] : ru?.toString?.()?.slice(0, 10) ?? '';
       this.repeatFrequency = event.rrule.includes('DAILY') ? 'daily' : event.rrule.includes('MONTHLY') ? 'monthly' : 'weekly';
       const byday = (event.rrule.match(/BYDAY=([^;]+)/i) || [])[1];
       if (byday) this.weeklyDays = byday.split(',').map((d) => d.trim());
@@ -239,6 +265,7 @@ export class EditScheduledEventModal extends CreateScheduledEventModal {
       return;
     }
     // all_future: PATCH the event with form values (simplified; full split logic can be added later)
+    const rruleVal = this.rrule;
     const payload = {
       title: this.title,
       description: this.description || undefined,
@@ -246,9 +273,12 @@ export class EditScheduledEventModal extends CreateScheduledEventModal {
       endAt: this.endAt,
       timeZone: this.timeZone,
       allDay: this.allDay,
-      rrule: this.rrule || undefined,
       exdates: this.exdatesForPayload,
     };
+    if (rruleVal && this.recursUntil) {
+      payload.rrule = rruleVal;
+      payload.recursUntil = this.recursUntil;
+    }
     await this.atomic.updateModel(this.event, payload);
     this.promise.resolve({ result: 'saved', model: this.event });
   });
@@ -343,6 +373,22 @@ export default class ScheduledEventModalComponent extends Component {
             </div>
           </div>
         {{/if}}
+
+        {{#unless (eq this.modalDialog.repeatFrequency "none")}}
+          <div class="form-group">
+            <label class="form-label" for="scheduled-event-recurs-until">Repeat until</label>
+            <p class="form-hint mb-2">
+              Last calendar day an occurrence may fall on ({{@modalDialog.timeZone}}). Start and end times above apply only to the first occurrence.
+            </p>
+            <input
+              id="scheduled-event-recurs-until"
+              type="date"
+              class="form-input"
+              value={{@modalDialog.recursUntil}}
+              {{on "input" @modalDialog.updateRecursUntil}}
+            />
+          </div>
+        {{/unless}}
 
         <div class="form-group">
           <span class="form-label">Exclude dates (optional)</span>

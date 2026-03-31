@@ -131,12 +131,11 @@ export default class SessionService extends Service {
     if (!this.isAuthenticated) return null;
     if (this.currentUser) return this.currentUser;
 
-    //try {
+    try {
       this.currentUser = await this.store.adapterFor('user').me();
-    //} catch {
-    //  debugger;
-    //  this.invalidate();
-    //}
+    } catch {
+      this.invalidate();
+    }
   }
 
   invalidate = () => {

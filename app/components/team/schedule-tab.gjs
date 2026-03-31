@@ -6,7 +6,7 @@ import { UiCard, UiButton } from 'frontend/components/ui';
 import { Await, Errors } from 'frontend/utils/stdlib';
 import FormattedTime from 'frontend/components/formatted-time';
 import { parseIcalToOccurrences } from 'frontend/utils/parse-ical-occurrences';
-import { appendRruleUntil } from 'frontend/utils/rrule-until';
+import { recursUntilDateBeforeOccurrence } from 'frontend/utils/recurrence-truncate';
 import ScheduledEventModalComponent, { CreateScheduledEventModal, EditScheduledEventModal } from 'frontend/components/scheduled-event/modal';
 import OccurrenceIntentModalComponent, { OccurrenceIntentModal } from 'frontend/components/team/occurrence-intent-modal';
 import CancelReasonModalComponent, { CancelReasonModal } from 'frontend/components/team/cancel-reason-modal';
@@ -100,9 +100,19 @@ export default class ScheduleTab extends Component {
         await this.atomic.updateModel(event, { exdates });
         this.alerts.success('Event removed from schedule.');
       } else {
-        const untilIso = new Date(new Date(occ.startAt).getTime() - 1000).toISOString();
-        const newRrule = appendRruleUntil(event.rrule, untilIso);
-        await this.atomic.updateModel(event, { rrule: newRrule });
+        const startIso =
+          typeof event.startAt === 'string' ? event.startAt : event.startAt?.toISO?.() ?? String(event.startAt);
+        const nextUntil = recursUntilDateBeforeOccurrence({
+          eventStartAtIso: startIso,
+          occurrenceStartAtIso: occ.startAt,
+          rrule: event.rrule,
+          timeZone: event.timeZone,
+        });
+        if (nextUntil) {
+          await this.atomic.updateModel(event, { recursUntil: nextUntil });
+        } else {
+          await this.atomic.updateModel(event, { rrule: null, recursUntil: null });
+        }
         this.alerts.success('All future occurrences removed.');
       }
       await this.loadOccurrencesTask.perform();
@@ -147,16 +157,11 @@ export default class ScheduleTab extends Component {
     const result = await this.getScope(occ, 'edit');
     if (result == null) return;
     const event = await this.store.findRecord('scheduled-event', occ.eventId);
-    let defaultTimeZone = 'America/Chicago';
-    try {
-      const league = await this.args.team.league;
-      const season = await league.season;
-      const activityType = await season.activityType;
-      const org = await activityType.organization;
-      if (org?.timeZone) defaultTimeZone = org.timeZone;
-    } catch {
-      // use default timezone
-    }
+    const league = await this.args.team.league;
+    const season = await league.season;
+    const activityType = await season.activityType;
+    const org = await activityType.organization;
+    const defaultTimeZone = org.timeZone;
     const modalDialog = new EditScheduledEventModal({
       event,
       occurrence: occ,
