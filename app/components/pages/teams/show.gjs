@@ -1,5 +1,5 @@
 import Component from '@glimmer/component';
-import { cached, service, on, array, LinkTo, args, tracked, eq, fn, action } from 'frontend/utils/stdlib';
+import { cached, service, on, array, LinkTo, args, tracked, eq, action } from 'frontend/utils/stdlib';
 import { task } from 'ember-concurrency';
 import { UiButton, UiTabs } from 'frontend/components/ui';
 import { Breadcrumbs, DetailHeader } from 'frontend/components/layout';
@@ -17,12 +17,49 @@ import ScheduleTab from 'frontend/components/team/schedule-tab';
 export default class TeamShowPage extends Component {
   @service atomic;
   @service store;
+  @service session;
+  @service cache;
   @service pagination;
   @service router;
   @service alerts;
   @service modal;
 
   @tracked activeTab = 'Roster';
+
+  @cached
+  get fetchOrganizationRoleTaskInstance() {
+    return this.fetchOrganizationRole.perform(this.args.org);
+  }
+
+  fetchOrganizationRole = task(async (org) => {
+    return await this.session.organizationRoleFor(org);
+  });
+
+  @cached
+  get organizationRole() {
+    return this.fetchOrganizationRoleTaskInstance.value;
+  }
+
+  get isOrgAdmin() {
+    return this.organizationRole === 'admin';
+  }
+
+  @cached
+  get hasStaffRoleOnTeam() {
+    const members = this.cache.get(`team-${this.args.team.id}-associated-members`) ?? [];
+    const roles = new Set(['coach', 'assistant_coach', 'manager']);
+    return members.some((m) => roles.has(m.role));
+  }
+
+  @cached
+  get canManageRoster() {
+    return this.isOrgAdmin || this.hasStaffRoleOnTeam;
+  }
+
+  @cached
+  get rosterOnCreate() {
+    return this.canManageRoster ? this.addMember.perform : undefined;
+  }
 
   @cached
   get rosterPaginator() {
@@ -66,12 +103,14 @@ export default class TeamShowPage extends Component {
     <DetailHeader>
       <:title>{{@team.name}}</:title>
       <:actions>
-        <LinkTo @route="orgs.org.teams.team.edit" @models={{array @org.slug @team.id}}>
-          <UiButton @variant="ghost" @size="sm">Edit</UiButton>
-        </LinkTo>
-        <UiButton @variant="ghost" @size="sm" class="text-danger" {{on "click" this.deleteTeam.perform}}>
-          Delete
-        </UiButton>
+        {{#if this.isOrgAdmin}}
+          <LinkTo @route="orgs.org.teams.team.edit" @models={{array @org.slug @team.id}}>
+            <UiButton @variant="ghost" @size="sm">Edit</UiButton>
+          </LinkTo>
+          <UiButton @variant="ghost" @size="sm" class="text-danger" {{on "click" this.deleteTeam.perform}}>
+            Delete
+          </UiButton>
+        {{/if}}
       </:actions>
       <:meta as |Meta|>
         <Meta @label="League">
@@ -92,9 +131,11 @@ export default class TeamShowPage extends Component {
         {{#if (eq activeTab "Roster")}}
           <div class="section-header">
             <h2 class="section-header__title">Roster</h2>
-            <UiButton @size="sm" {{on "click" this.addMember.perform}}>Add Member</UiButton>
+            {{#if this.canManageRoster}}
+              <UiButton @size="sm" {{on "click" this.addMember.perform}}>Add Member</UiButton>
+            {{/if}}
           </div>
-          <TeamMembershipList @paginator={{this.rosterPaginator}} @onCreate={{this.addMember.perform}} />
+          <TeamMembershipList @paginator={{this.rosterPaginator}} @onCreate={{this.rosterOnCreate}} />
         {{else}}
           <ScheduleTab @team={{@team}} />
         {{/if}}

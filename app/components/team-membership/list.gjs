@@ -14,7 +14,7 @@ function roleLabel(role) {
 
 @args({
   paginator: { type: Paginator, required: true },
-  onCreate: { type: 'function' },
+  onCreate: { type: 'function', allowNull: true },
 })
 export default class TeamMembershipListComponent extends Component {
   @service atomic;

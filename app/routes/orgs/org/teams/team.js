@@ -3,11 +3,19 @@ import { service } from '@ember/service';
 
 export default class TeamRoute extends Route {
   @service store;
+  @service cache;
 
   async model(params) {
     const team = await this.store.findRecord('team', params.team_id);
     const org = this.modelFor('orgs.org');
+    await this.loadTeamAssociatedMembers(params.team_id);
     return { team, org };
+  }
+
+  async loadTeamAssociatedMembers(teamId) {
+    const members = await this.store.adapterFor('team').associatedMembersFor(teamId);
+    this.cache.set(`team-${teamId}-associated-members`, members);
+    return members;
   }
 
   async breadcrumbParents(model) {

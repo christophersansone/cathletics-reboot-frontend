@@ -1,5 +1,5 @@
 import Component from '@glimmer/component';
-import { tracked, args, service, on, action, fn } from 'frontend/utils/stdlib';
+import { tracked, args, service, on, action, fn, cached } from 'frontend/utils/stdlib';
 import { task } from 'ember-concurrency';
 import { DateTime } from 'luxon';
 import { UiCard, UiButton } from 'frontend/components/ui';
@@ -13,10 +13,12 @@ import CancelReasonModalComponent, { CancelReasonModal } from 'frontend/componen
 
 @args({
   team: { required: true },
+  canManageSchedule: { type: 'boolean', allowNull: true },
 })
 export default class ScheduleTab extends Component {
   @service session;
   @service atomic;
+  @service cache;
   @service modal;
   @service alerts;
   @service store;
@@ -28,6 +30,39 @@ export default class ScheduleTab extends Component {
   constructor(owner, args) {
     super(owner, args);
     this.setDefaultRange();
+  }
+
+  get canManageSchedule() {
+    return this.isTeamManager || this.isOrgAdmin;
+  }
+
+  @cached
+  get isTeamManager() {
+    const members = this.cache.get(`team-${this.args.team.id}-associated-members`) ?? [];
+    const roles = new Set(['coach', 'assistant_coach', 'manager']);
+    return members.some((m) => roles.has(m.role));
+  }
+
+  @cached
+  get fetchOrganizationRoleTaskInstance() {
+    return this.fetchOrganizationRole.perform(this.args.team);
+  }
+
+  fetchOrganizationRole = task(async (team) => {
+    const league = await team.league;
+    const season = await league.season;
+    const activityType = await season.activityType;
+    const organization = await activityType.organization;
+    return await this.session.organizationRoleFor(organization);
+  });
+
+  @cached
+  get organizationRole() {
+    return this.fetchOrganizationRoleTaskInstance.value;
+  }
+
+  get isOrgAdmin() {
+    return this.organizationRole === 'admin';
   }
 
   setDefaultRange() {
@@ -181,9 +216,11 @@ export default class ScheduleTab extends Component {
     <UiCard>
       <div class="header flex flex-wrap gap-2 items-center justify-between">
         <h2 class="title text-lg font-semibold">Schedule</h2>
-        <UiButton @variant="primary" {{on "click" this.createEvent.perform}}>
-          Add event
-        </UiButton>
+        {{#if this.canManageSchedule}}
+          <UiButton @variant="primary" {{on "click" this.createEvent.perform}}>
+            Add event
+          </UiButton>
+        {{/if}}
       </div>
 
       <Await @promise={{this.occurrencesPromise}} @showLatest={{true}}>
@@ -201,18 +238,26 @@ export default class ScheduleTab extends Component {
                       <span class="item-cancelled-label">Cancelled{{#if occ.cancellationReason}} – {{occ.cancellationReason}}{{/if}}</span>
                     {{/if}}
                   </div>
-                  <div class="item-actions">
-                    <button type="button" class="btn-link text-sm" {{on "click" (fn this.openEditOccurrence occ)}}>Edit</button>
-                    {{#unless occ.cancelled}}
-                      <button type="button" class="btn-link text-sm" {{on "click" (fn this.openCancelOccurrence occ)}}>Cancel</button>
-                    {{/unless}}
-                    <button type="button" class="btn-link text-sm text-danger" {{on "click" (fn this.openRemoveOccurrence occ)}}>Remove</button>
-                  </div>
+                  {{#if this.canManageSchedule}}
+                    <div class="item-actions">
+                      <button type="button" class="btn-link text-sm" {{on "click" (fn this.openEditOccurrence occ)}}>Edit</button>
+                      {{#unless occ.cancelled}}
+                        <button type="button" class="btn-link text-sm" {{on "click" (fn this.openCancelOccurrence occ)}}>Cancel</button>
+                      {{/unless}}
+                      <button type="button" class="btn-link text-sm text-danger" {{on "click" (fn this.openRemoveOccurrence occ)}}>Remove</button>
+                    </div>
+                  {{/if}}
                 </li>
               {{/each}}
             </ul>
           {{else}}
-            <p class="text-secondary text-sm text-center py-8">No events in this range. Add an event to get started.</p>
+            <p class="text-secondary text-sm text-center py-8">
+              {{#if this.canManageSchedule}}
+                No events in this range. Add an event to get started.
+              {{else}}
+                No events in this range.
+              {{/if}}
+            </p>
           {{/if}}
         </:resolved>
         <:rejected as |error|>

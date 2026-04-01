@@ -5,14 +5,7 @@ export default class OrgsIndexRoute extends Route {
   @service session;
   @service router;
 
-  beforeModel() {
-    if (!this.session.isAuthenticated) {
-      this.router.transitionTo('login');
-    }
-  }
-
   async model() {
-    await this.session.loadCurrentUser();
     let memberships = await this.session.currentUser?.organizationMemberships;
     let orgs = [];
     if (memberships) {

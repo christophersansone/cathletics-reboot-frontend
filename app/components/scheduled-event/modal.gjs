@@ -162,7 +162,6 @@ export class CreateScheduledEventModal extends ModalDialog {
 
   @action
   updateRecursUntil(e) {
-    console.log(e.target.value)
     this.recursUntil = e.target?.value ?? '';
   }
 

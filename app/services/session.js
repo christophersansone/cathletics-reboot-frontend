@@ -138,6 +138,12 @@ export default class SessionService extends Service {
     }
   }
 
+  async organizationRoleFor(organization) {
+    const memberships = await this.currentUser?.organizationMemberships;
+    const membership = memberships?.find((m) => m.belongsTo('organization').id() === organization.id);
+    return membership?.role;
+  }
+
   invalidate = () => {
     this.accessToken = null;
     this.refreshToken = null;
