@@ -16,6 +16,7 @@ export default class CacheService extends Service {
         get: (_, prop) => this.#read(prop),
 
         set: (_, prop, value) => {
+          // eslint-disable-next-line ember/classic-decorator-no-classic-methods
           this.set(prop, value);
           return true;
         },

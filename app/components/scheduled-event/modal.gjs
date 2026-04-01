@@ -4,7 +4,7 @@ import { UiModal, UiButton, UiInput } from 'frontend/components/ui';
 import { ModalDialog } from 'frontend/services/modal';
 import { task } from 'ember-concurrency';
 import preventDefault from 'frontend/helpers/prevent-default';
-import { toLocalInputValue, fromLocalInputValue } from 'frontend/utils/datetime';
+import { toLocalInputValue, fromLocalInputValue, occurrenceStartToExdate } from 'frontend/utils/datetime';
 import { DateTime } from 'luxon';
 
 const RRULE_DAYS = ['SU', 'MO', 'TU', 'WE', 'TH', 'FR', 'SA'];
@@ -258,7 +258,8 @@ export class EditScheduledEventModal extends CreateScheduledEventModal {
         schedulable: this.team,
       };
       await this.atomic.createModel('scheduled-event', payload);
-      const exdates = [...(this.event.exdates || []), this.occurrence.startAt];
+      const ex = occurrenceStartToExdate(this.occurrence.startAt, this.timeZone);
+      const exdates = [...(this.event.exdates || []), ex].filter(Boolean);
       await this.atomic.updateModel(this.event, { exdates });
       this.promise.resolve({ result: 'saved', model: null });
       return;

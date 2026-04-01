@@ -6,6 +6,7 @@ import { UiCard, UiButton } from 'frontend/components/ui';
 import { Await, Errors } from 'frontend/utils/stdlib';
 import FormattedTime from 'frontend/components/formatted-time';
 import { parseIcalToOccurrences } from 'frontend/utils/parse-ical-occurrences';
+import { occurrenceStartToExdate } from 'frontend/utils/datetime';
 import { recursUntilDateBeforeOccurrence } from 'frontend/utils/recurrence-truncate';
 import ScheduledEventModalComponent, { CreateScheduledEventModal, EditScheduledEventModal } from 'frontend/components/scheduled-event/modal';
 import OccurrenceIntentModalComponent, { OccurrenceIntentModal } from 'frontend/components/team/occurrence-intent-modal';
@@ -131,7 +132,8 @@ export default class ScheduleTab extends Component {
     const event = await this.store.findRecord('scheduled-event', occ.eventId);
     try {
       if (result.scope === 'this_one') {
-        const exdates = [...(event.exdates || []), occ.startAt];
+        const ex = occurrenceStartToExdate(occ.startAt, event.timeZone);
+        const exdates = [...(event.exdates || []), ex].filter(Boolean);
         await this.atomic.updateModel(event, { exdates });
         this.alerts.success('Event removed from schedule.');
       } else {

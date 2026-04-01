@@ -95,3 +95,19 @@ export function fromLocalInputValue(value, zone) {
   if (!value || !zone) return null;
   return DateTime.fromISO(value, { zone }).toUTC();
 }
+
+/**
+ * Calendar date (YYYY-MM-dd) for scheduled-event `exdates`: maps an occurrence
+ * instant (ISO UTC string or DateTime-like) to the event IANA zone.
+ */
+export function occurrenceStartToExdate(startAt, ianaTimeZone) {
+  const zone = ianaTimeZone || 'UTC';
+  const iso =
+    typeof startAt === 'string'
+      ? startAt
+      : startAt?.toISO?.() ?? startAt?.toISOString?.() ?? '';
+  if (!iso) return '';
+  const dt = DateTime.fromISO(String(iso), { zone: 'utc' });
+  if (!dt.isValid) return '';
+  return dt.setZone(zone).toISODate();
+}
