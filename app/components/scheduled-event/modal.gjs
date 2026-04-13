@@ -1,6 +1,6 @@
 import Component from '@glimmer/component';
 import { Errors, action, tracked, on, not, args, eq, fn } from 'frontend/utils/stdlib';
-import { UiModal, UiButton, UiInput } from 'frontend/components/ui';
+import { UiModal, UiButton, UiInput, UiSelect } from 'frontend/components/ui';
 import { ModalDialog } from 'frontend/services/modal';
 import { task } from 'ember-concurrency';
 import preventDefault from 'frontend/helpers/prevent-default';
@@ -37,6 +37,7 @@ export class CreateScheduledEventModal extends ModalDialog {
   @tracked recursUntil = '';
   @tracked exdates = [];
   @tracked exdateToAdd = '';
+  @tracked rsvpMode = 'none';
 
   title_label = 'New Event';
 
@@ -81,6 +82,7 @@ export class CreateScheduledEventModal extends ModalDialog {
       endAt: this.endAt,
       timeZone: this.timeZone,
       allDay: this.allDay,
+      rsvpMode: this.rsvpMode,
       schedulable: this.team,
     };
     const rruleVal = this.rrule;
@@ -145,6 +147,11 @@ export class CreateScheduledEventModal extends ModalDialog {
   @action
   updateAllDay(e) {
     this.allDay = e.target.checked;
+  }
+
+  @action
+  updateRsvpMode(e) {
+    this.rsvpMode = e.target.value;
   }
 
   @action
@@ -226,6 +233,7 @@ export class EditScheduledEventModal extends CreateScheduledEventModal {
     this.description = event.description ?? '';
     this.timeZone = event.timeZone ?? this.defaultTimeZone;
     this.allDay = event.allDay ?? false;
+    this.rsvpMode = event.rsvpMode ?? 'none';
     const startAt = occurrence.startAt ?? event.startAt;
     const endAt = occurrence.endAt ?? event.endAt;
     this.startAt = typeof startAt === 'string' ? DateTime.fromISO(startAt, { zone: 'utc' }) : startAt;
@@ -255,6 +263,7 @@ export class EditScheduledEventModal extends CreateScheduledEventModal {
         endAt: this.endAt,
         timeZone: this.timeZone,
         allDay: this.allDay,
+        rsvpMode: this.rsvpMode,
         schedulable: this.team,
       };
       await this.atomic.createModel('scheduled-event', payload);
@@ -273,6 +282,7 @@ export class EditScheduledEventModal extends CreateScheduledEventModal {
       endAt: this.endAt,
       timeZone: this.timeZone,
       allDay: this.allDay,
+      rsvpMode: this.rsvpMode,
       exdates: this.exdatesForPayload,
     };
     if (rruleVal && this.recursUntil) {
@@ -340,6 +350,18 @@ export default class ScheduledEventModalComponent extends Component {
           <input type="checkbox" checked={{@modalDialog.allDay}} {{on "change" @modalDialog.updateAllDay}} />
           <span class="text-sm">All day</span>
         </label>
+
+        <UiSelect
+          @label="RSVPs"
+          @id="scheduled-event-rsvp-mode"
+          @hint="How team members respond to this event"
+          value={{@modalDialog.rsvpMode}}
+          {{on "change" @modalDialog.updateRsvpMode}}
+        >
+          <option value="none">None — do not collect RSVPs</option>
+          <option value="full">Full — Yes / No / Maybe</option>
+          <option value="regrets_only">Regrets only — notify if can't attend</option>
+        </UiSelect>
 
         {{#if @modalDialog.showRepeatSection}}
         <div class="form-group">

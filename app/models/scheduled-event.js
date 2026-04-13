@@ -14,6 +14,7 @@ export default class ScheduledEventModel extends Model {
   @attr() cancelledOccurrences; // array of { start_at, reason }
   @attr('date') cancelledFrom;
   @attr('string') cancellationReason;
+  @attr('string') rsvpMode;
 
   @belongsTo('schedulable', { polymorphic: true, async: true, inverse: null }) schedulable;
 }

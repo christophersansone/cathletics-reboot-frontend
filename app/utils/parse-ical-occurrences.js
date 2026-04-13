@@ -1,9 +1,34 @@
 import ICAL from 'ical.js';
 
+const PARTSTAT_TO_RESPONSE = {
+  ACCEPTED: 'yes',
+  DECLINED: 'no',
+  TENTATIVE: 'maybe',
+};
+
+function parseAttendeeRsvp(vevent) {
+  const prop = vevent.getFirstProperty('attendee');
+  if (!prop) return null;
+
+  const partstat = (prop.getParameter('partstat') || '').toUpperCase();
+  const response = PARTSTAT_TO_RESPONSE[partstat] ?? null;
+  const userId = prop.getParameter('x-user-id') || null;
+  const rsvpId = prop.getParameter('x-rsvp-id') || null;
+
+  return { response, userId, rsvpId };
+}
+
+function parseRsvpCounts(vevent) {
+  const yes = parseInt(vevent.getFirstPropertyValue('x-rsvp-yes-count'), 10) || 0;
+  const no = parseInt(vevent.getFirstPropertyValue('x-rsvp-no-count'), 10) || 0;
+  const maybe = parseInt(vevent.getFirstPropertyValue('x-rsvp-maybe-count'), 10) || 0;
+  return { yes, no, maybe };
+}
+
 /**
- * Parses an iCalendar (text/calendar) string and returns an array of occurrence
- * objects suitable for the schedule tab: { title, startAt, endAt, timeZone, eventId, cancelled, cancellationReason, isRecurring }.
- * Uses X-EVENT-ID, X-TZID, X-RECURRING, STATUS, X-CANCELLATION-REASON from our backend when present.
+ * Parses an iCalendar (text/calendar) string and returns an array of occurrence objects suitable
+ * for the schedule tab. Uses standard ATTENDEE/PARTSTAT for the current user's RSVP, and custom
+ * X-RSVP-MODE / X-RSVP-*-COUNT properties for mode and summary counts.
  */
 export function parseIcalToOccurrences(icalString) {
   if (!icalString || typeof icalString !== 'string') return [];
@@ -46,6 +71,12 @@ export function parseIcalToOccurrences(icalString) {
     const recProp = vevent.getFirstProperty('x-recurring') || vevent.getFirstProperty('X-RECURRING');
     if (recProp) isRecurring = String(recProp.getFirstValue() || '').toLowerCase() === 'true';
 
+    const rsvpModeRaw = vevent.getFirstPropertyValue('x-rsvp-mode');
+    const rsvpMode = rsvpModeRaw ? String(rsvpModeRaw) : 'none';
+
+    const myRsvp = rsvpMode !== 'none' ? parseAttendeeRsvp(vevent) : null;
+    const rsvpCounts = rsvpMode !== 'none' ? parseRsvpCounts(vevent) : { yes: 0, no: 0, maybe: 0 };
+
     results.push({
       title: summary,
       startAt,
@@ -55,6 +86,9 @@ export function parseIcalToOccurrences(icalString) {
       cancelled,
       cancellationReason,
       isRecurring,
+      rsvpMode,
+      myRsvp,
+      rsvpCounts,
     });
   }
 
